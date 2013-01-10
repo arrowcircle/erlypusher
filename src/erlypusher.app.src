@@ -1,0 +1,13 @@
+{application, erlypusher,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  cowboy
+                 ]},
+  {mod, { erlypusher_app, []}},
+  {env, []}
+ ]}.

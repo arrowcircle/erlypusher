@@ -1,0 +1,9 @@
+{application,erlypusher,
+             [{description,[]},
+              {vsn,"1"},
+              {registered,[]},
+              {applications,[kernel,stdlib,cowboy]},
+              {mod,{erlypusher_app,[]}},
+              {env,[]},
+              {modules,[erlypusher,erlypusher_app,erlypusher_sup,main_page,
+                        websocket_handler]}]}.
