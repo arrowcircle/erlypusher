@@ -6,4 +6,4 @@
               {mod,{erlypusher_app,[]}},
               {env,[]},
               {modules,[erlypusher,erlypusher_app,erlypusher_sup,main_page,
-                        websocket_handler]}]}.
+                        mochijson2,uuid,websocket_handler]}]}.

@@ -10,14 +10,14 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    cowboy:start_listener(whatever,5,cowboy_tcp_transport, [{port,8080}], cowboy_http_protocol,
-            [{dispatch,[
-                        {'_',[
-                               {[<<"websocket">>],websocket_handler,[]},
-                               {[],main_page,[]}
-                             ]}
-                       ]}]
-          ),
+    cowboy:start_listener(whatever, 5, cowboy_tcp_transport, [{port, 8080}], cowboy_http_protocol,
+        [{dispatch,[
+                    {'_',[
+                           {[<<"app">>, app_id], websocket_handler, []},
+                           {[], main_page, []}
+                         ]}
+                   ]}]
+    ),
     erlypusher_sup:start_link().
 
 stop(_State) ->

@@ -6,53 +6,29 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  {ok, Req2} = cowboy_http_req:reply(200, [], <<"<html>
-<head>
-<script type=\"text/javascript\">
-var ws;
-function addStatus(text){
-  var date = new Date();
-  document.getElementById('status').innerHTML
-    = document.getElementById('status').innerHTML
-    + date + \": \" + text + \"<br/>\";
-}
-function ready(){
-  if (\"MozWebSocket\" in window) {
-    WebSocket = MozWebSocket;
-  }
-  if (\"WebSocket\" in window) {
-    // browser supports websockets
-                ws = new WebSocket(\"ws://localhost:8080/websocket\");
-    ws.onopen = function() {
-      // websocket is connected
-      addStatus(\"websocket connected!\");
-      // send hello data to server.
-      ws.send(\"hello server!\");
-      addStatus(\"sent message to server: 'hello server'!\");
-    };
-    ws.onmessage = function (evt) {
-      var receivedMsg = evt.data;
-      addStatus(\"server sent the following: '\" + receivedMsg + \"'\");
-    };
-    ws.onclose = function() {
-      // websocket was closed
-      addStatus(\"websocket was closed\");
-    };
-  } else {
-    // browser does not support websockets
-    addStatus(\"sorry, your browser does not support websockets.\");
-  }
-}
-</script>
-</head>
-<body onload=\"ready();\">
-<form name=\"chat\" onsubmit=\"ws.send(document.chat.msg.value); return false;\">
-<input name=\"msg\" type=\"text\"/>
-<input type=\"submit\"/>
-</form>
-<div id=\"status\"></div>
-</body>
-</html>">>, Req),
+  io:format("Got main_page handle line 8~n"),
+  {ok, Req2} = cowboy_http_req:reply(200, [], <<"
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Websocket Test</title>
+  </head>
+  <body>
+    <script src=\"http://js.pusherapp.com/1.8/pusher.min.js\"></script>
+    <script type=\"text/javascript\">
+      Pusher.host    = \"127.0.0.1\"
+      Pusher.ws_port = \"8080\"
+      Pusher.log = function(data) {
+        console.log('\t\t', data);
+      };
+      var pusher = new Pusher('765ec374ae0a69f4ce44');
+      pusher.bind('pusher:error', function(data) { console.log(data.to_json) })
+      var myChannel = pusher.subscribe('MY_CHANNEL');
+      myChannel.bind('an_event', function(data) { console.log(data) })
+    </script>
+  </body>
+</html>
+">>, Req),
   {ok, Req2, State}.
 
 
