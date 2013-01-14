@@ -51,11 +51,17 @@ websocket_handle({text, Data}, Req, State) ->
   Resp = make_ok_subscribe_channel_response(Channel_name),
   {reply, {text, Resp}, Req, State, hibernate};
 
+% ok connection
+websocket_handle({text, Data}, Req, State) ->
+  Channel_name = get_channel_name(Data),
+  Resp = make_ok_subscribe_channel_response(Channel_name),
+  {reply, {text, Resp}, Req, State, hibernate};
+
+
 websocket_handle(_Any, Req, State) ->
   {ok, Req, State, hibernate}.
 
 websocket_info(_Info, Req, State) ->
-  % io:format("~p~n", [gproc:i()]),
   {reply, {text, _Info}, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, _State) ->
