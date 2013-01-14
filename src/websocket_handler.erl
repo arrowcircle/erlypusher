@@ -18,10 +18,9 @@ make_ok_connection_response(Socket_id) ->
     Temp ++ "\"}}".
 
 make_ok_subscribe_channel_response(Channel_name) ->
-  io:format("Generating channel name: ~p~n", [Channel_name]),
-  A = "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel: \"",
-  B = "\"}",
-  <<A/binary, Channel_name, B/binary>>.
+  A = "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"",
+  B = A ++ binary_to_list(Channel_name),
+  B ++ "\"}".
 
 get_channel_name(Data) ->
   {struct, Json} = mochijson2:decode(binary_to_list(Data)),
@@ -48,10 +47,9 @@ websocket_init(_Any, Req, _Opt) ->
 
 % subscribe to channel
 websocket_handle({text, Data}, Req, State) ->
-  Channel_name = <<"MY_CHANNEL">>,
+  Channel_name = get_channel_name(Data),
   Resp = make_ok_subscribe_channel_response(Channel_name),
-  io:format("~p~n", [Resp]),
-  {ok, Req, State, hibernate};
+  {reply, {text, Resp}, Req, State, hibernate};
 
 websocket_handle(_Any, Req, State) ->
   {ok, Req, State, hibernate}.
