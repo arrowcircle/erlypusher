@@ -22,6 +22,12 @@ make_ok_subscribe_channel_response(Channel_name) ->
   B = A ++ binary_to_list(Channel_name),
   B ++ "\"}".
 
+make_ok_ping_response() ->
+  "{\"event\": \"pusher:pong\", \"data\": {}}".
+
+make_ok_pong_response() ->
+  "{\"event\": \"pusher:ping\", \"data\": {}}".
+
 get_channel_name(Data) ->
   {struct, Json} = mochijson2:decode(binary_to_list(Data)),
   [_|Json_tail] = Json,
@@ -39,8 +45,15 @@ get_action_name(Data) ->
 get_pid_from_req(Req) ->
   element(5, Req).
 
-respond_to_action(<<"pusher:subscribe">>, Socket_id, Channel_name) ->
-  gproc:send({p, l, Socket_id}, make_ok_subscribe_channel_response(Channel_name)).
+respond_to_action(<<"pusher:subscribe">>, Data) ->
+  make_ok_subscribe_channel_response(get_channel_name(Data));
+
+respond_to_action(<<"pusher:ping">>, Data) ->
+  io:format("Receiver ping~n"),
+  make_ok_ping_response().
+
+% respond_to_action(<<"pusher:pong">>, Data) ->
+%   make_ok_pong_response().
 
 websocket_init(_Any, Req, _Opt) ->
     Socket_id = uuid:to_string(uuid:v4()),
@@ -48,11 +61,14 @@ websocket_init(_Any, Req, _Opt) ->
     Pid ! make_ok_connection_response(Socket_id),
   {ok, Req, undefined, hibernate}.
 
+subscribe_to_channel(Data) ->
+  Channel_name = get_channel_name(Data),
+  gproc:reg({p, l, Channel_name}),
+  make_ok_subscribe_channel_response(Channel_name).
+
 % subscribe to channel
 websocket_handle({text, Data}, Req, State) ->
-  Channel_name = get_channel_name(Data),
-  Resp = make_ok_subscribe_channel_response(Channel_name),
-  gproc:reg({p, l, Channel_name}),
+  Resp = respond_to_action(get_action_name(Data), Data),
   {reply, {text, Resp}, Req, State, hibernate};
 
 websocket_handle(_Any, Req, State) ->
