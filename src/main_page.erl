@@ -17,7 +17,7 @@ handle(Req, State) ->
     <script src=\"http://js.pusherapp.com/1.8/pusher.min.js\"></script>
     <script type=\"text/javascript\">
       Pusher.host    = \"127.0.0.1\"
-      Pusher.ws_port = \"8080\"
+      Pusher.ws_port = \"8081\"
       Pusher.log = function(data) {
         console.log('\t\t', data);
       };
