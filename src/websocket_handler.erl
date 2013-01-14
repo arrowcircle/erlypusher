@@ -52,8 +52,8 @@ websocket_init(_Any, Req, _Opt) ->
 websocket_handle({text, Data}, Req, State) ->
   Channel_name = get_channel_name(Data),
   Resp = make_ok_subscribe_channel_response(Channel_name),
+  gproc:reg({p, l, Channel_name}),
   {reply, {text, Resp}, Req, State, hibernate};
-
 
 websocket_handle(_Any, Req, State) ->
   {ok, Req, State, hibernate}.
