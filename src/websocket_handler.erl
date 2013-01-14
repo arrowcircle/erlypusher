@@ -45,6 +45,7 @@ websocket_init(_Any, Req, _Opt) ->
   {ok, Req, undefined, hibernate}.
 
 websocket_handle({text, Data}, Req, State) ->
+  io:format("~p~n", [Data]),
   {ok, Req, State, hibernate};
 
 websocket_handle(_Any, Req, State) ->
