@@ -36,22 +36,19 @@ get_action_name(Data) ->
   {_, Action_name} = Head,
   Action_name.
 
+get_pid_from_req(Req) ->
+  element(5, Req).
+
 respond_to_action(<<"pusher:subscribe">>, Socket_id, Channel_name) ->
   gproc:send({p, l, Socket_id}, make_ok_subscribe_channel_response(Channel_name)).
 
 websocket_init(_Any, Req, _Opt) ->
     Socket_id = uuid:to_string(uuid:v4()),
-    gproc:reg({p, l, Socket_id}),
-    gproc:send({p, l, Socket_id}, make_ok_connection_response(Socket_id)),
+    Pid = get_pid_from_req(Req),
+    Pid ! make_ok_connection_response(Socket_id),
   {ok, Req, undefined, hibernate}.
 
 % subscribe to channel
-websocket_handle({text, Data}, Req, State) ->
-  Channel_name = get_channel_name(Data),
-  Resp = make_ok_subscribe_channel_response(Channel_name),
-  {reply, {text, Resp}, Req, State, hibernate};
-
-% ok connection
 websocket_handle({text, Data}, Req, State) ->
   Channel_name = get_channel_name(Data),
   Resp = make_ok_subscribe_channel_response(Channel_name),
