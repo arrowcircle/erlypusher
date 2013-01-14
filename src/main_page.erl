@@ -6,7 +6,6 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  io:format("Got main_page handle line 8~n"),
   {ok, Req2} = cowboy_http_req:reply(200, [], <<"
 <!DOCTYPE html>
 <html>
@@ -14,7 +13,7 @@ handle(Req, State) ->
     <title>Websocket Test</title>
   </head>
   <body>
-    <script src=\"http://js.pusherapp.com/1.8/pusher.min.js\"></script>
+    <script src=\"http://js.pusher.com/1.12/pusher.min.js\"></script>
     <script type=\"text/javascript\">
       Pusher.host    = \"127.0.0.1\"
       Pusher.ws_port = \"8081\"

@@ -51,6 +51,7 @@ websocket_handle(_Any, Req, State) ->
   {ok, Req, State, hibernate}.
 
 websocket_info(_Info, Req, State) ->
+  % io:format("~p~n", [gproc:i()]),
   {reply, {text, _Info}, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, _State) ->
