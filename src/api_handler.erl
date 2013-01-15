@@ -6,14 +6,14 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  {Path, Req2} = cowboy_http_req:path(Req),
-  [_|[AppId|_]] = Path,
-  [_|[_|[_|[ChannelName|_]]]] = Path,
+  {AppId, Req2} = cowboy_http_req:binding(app_id, Req),
+  {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
   Message = make_event_response(<<"test_event">>, <<"Data">>, <<"SocketId">>, AppId, ChannelName),
   gproc:send({p, l, ChannelName}, Message),
   io:format("~p~n", [Message]),
   % {ok, Req3} = cowboy_req:reply(200, [], <<Message>>, Req2),
-  {ok, Req2, State}.
+  {ok, Req4} = cowboy_http_req:reply(200, [], [<<"Got it\nChannel: ">>, ChannelName, <<"\n">>, <<"App_id: ">>, AppId], Req3),
+  {ok, Req4, State}.
 
 maybe_event(_, true, Req) ->
   {Name, Req2} = cowboy_req:val(<<"name">>, Req),

@@ -15,7 +15,7 @@ start(_StartType, _StartArgs) ->
                     {'_',[
                            {[<<"app">>, '_'], websocket_handler, []},
                            {[], main_page, []},
-                           {[<<"apps">>, '_', <<"channels">>, '_', <<"events">>], api_handler, []}
+                           {[<<"apps">>, app_id, <<"channels">>, channel_id, <<"events">>], api_handler, []}
                          ]}
                    ]}]
     ),
