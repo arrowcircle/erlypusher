@@ -12,13 +12,13 @@ init({_Any, http}, Req, []) ->
   end.
 
 make_ok_connection_response(Socket_id) ->
-    Temp = "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ Socket_id,
-    Temp ++ "\"}}".
+    Temp = "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ Socket_id ++ "\"}}",
+    Temp.
 
 make_ok_subscribe_channel_response(Channel_name) ->
   A = "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"",
-  B = A ++ binary_to_list(Channel_name),
-  B ++ "\"}".
+  B = A ++ binary_to_list(Channel_name) ++ "\"}",
+  B.
 
 make_ok_ping_response() ->
   "{\"event\": \"pusher:pong\", \"data\": {}}".
@@ -49,9 +49,9 @@ respond_to_action(<<"pusher:ping">>, Data) ->
   make_ok_ping_response().
 
 websocket_init(_Any, Req, _Opt) ->
-    Socket_id = uuid:to_string(uuid:v4()),
-    Pid = get_pid_from_req(Req),
-    Pid ! make_ok_connection_response(Socket_id),
+  Socket_id = uuid:to_string(uuid:v4()),
+  Pid = get_pid_from_req(Req),
+  Pid ! make_ok_connection_response(Socket_id),
   {ok, Req, undefined, hibernate}.
 
 websocket_handle({text, Data}, Req, State) ->
