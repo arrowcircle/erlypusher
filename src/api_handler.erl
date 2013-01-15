@@ -6,9 +6,14 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
+  %io:format("~p~n", [Req]),
   {AppId, Req2} = cowboy_http_req:binding(app_id, Req),
+  {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req),
+  {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req),
+  {EventSocket, _} = cowboy_http_req:qs_val(<<"socket_id">>, Req),
+  io:format("~p | ~p | ~p~n", [EventName, EventData, EventSocket]),
   {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
-  Message = make_event_response(<<"test_event">>, <<"Data">>, <<"SocketId">>, AppId, ChannelName),
+  Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
   gproc:send({p, l, ChannelName}, Message),
   io:format("~p~n", [Message]),
   % {ok, Req3} = cowboy_req:reply(200, [], <<Message>>, Req2),
@@ -34,7 +39,7 @@ maybe_event(_, _, Req) ->
 make_event_response(Name, Data, SocketId, AppId, ChannelName) ->
   A = "{\"event\": \"" ++ binary_to_list(Name),
   B = A ++ "\", \"data\": {",
-  C = B ++ binary_to_list(Data),
+  C = B ++ "",%binary_to_list(Data),
   D = C ++ "}, \"channel\": \"",
   E = D ++ binary_to_list(ChannelName),
   F = E ++ "\", \"socket_id\": \"",
