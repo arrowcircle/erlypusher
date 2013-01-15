@@ -40,12 +40,18 @@ get_action_name(Data) ->
 get_pid_from_req(Req) ->
   element(5, Req).
 
-respond_to_action(<<"pusher:subscribe">>, Data) ->
+respond_to_action(<<"pusher:subscribe">>, Data, _) ->
   ChannelName = get_channel_name(Data),
   gproc:reg({p, l, ChannelName}),
   make_ok_subscribe_channel_response(ChannelName);
 
-respond_to_action(<<"pusher:ping">>, Data) ->
+respond_to_action(<<"pusher:unsubscribe">>, Data, Req) ->
+  ChannelName = get_channel_name(Data),
+  Pid = get_pid_from_req(Req),
+  gproc:unreg({p, l, ChannelName}, Pid),
+  make_ok_subscribe_channel_response(ChannelName);
+
+respond_to_action(<<"pusher:ping">>, Data, _) ->
   make_ok_ping_response().
 
 websocket_init(_Any, Req, _Opt) ->
@@ -55,7 +61,7 @@ websocket_init(_Any, Req, _Opt) ->
   {ok, Req, undefined, hibernate}.
 
 websocket_handle({text, Data}, Req, State) ->
-  Resp = respond_to_action(get_action_name(Data), Data),
+  Resp = respond_to_action(get_action_name(Data), Data, Req),
   {reply, {text, Resp}, Req, State, hibernate};
 
 websocket_handle(_Any, Req, State) ->
