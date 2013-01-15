@@ -23,13 +23,10 @@ handle(Req, State) ->
 
 make_event_response(Name, Data, SocketId, AppId, ChannelName) ->
   A = "{\"event\": \"" ++ binary_to_list(Name),
-  B = A ++ "\", \"data\": ",
-  C = B ++ "\"" ++ binary_to_list(Data),
-  D = C ++ "\", \"channel\": \"",
-  E = D ++ binary_to_list(ChannelName),
-  F = E ++ "\", \"socket_id\": \"",
-  G = F ++ binary_to_list(SocketId),
-  G ++ "\"}".
+  B = A ++ "\", \"data\": " ++ "\"" ++ binary_to_list(Data),
+  C = B ++ "\", \"channel\": \"" ++ binary_to_list(ChannelName),
+  D = C ++ "\", \"socket_id\": \"" ++ binary_to_list(SocketId) ++ "\"}",
+  D.
 
 terminate(_Req, _State) ->
   ok.
