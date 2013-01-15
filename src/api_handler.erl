@@ -21,21 +21,6 @@ handle(Req, State) ->
   {ok, Req4} = cowboy_http_req:reply(200, [], [<<"ok">>], Req3),
   {ok, Req4, State}.
 
-maybe_event(_, true, Req) ->
-  {Name, Req2} = cowboy_req:val(<<"name">>, Req),
-  {Data, Req3} = cowboy_req:val(<<"data">>, Req2),
-  {SocketId, Req4} = cowboy_req:val(<<"socket_id">>, Req3),
-  {Path, Req5} = cowboy_http_req:path(Req4),
-  [_|[AppId|_]] = Path,
-  [_|[_|[_|[ChannelName|_]]]] = Path,
-  event(Name, Data, SocketId, AppId, ChannelName, Req5);
-
-maybe_event(<<"POST">>, false, Req) ->
-  cowboy_req:reply(400, Req);
-
-maybe_event(_, _, Req) ->
-  cowboy_req:reply(405, Req).
-
 make_event_response(Name, Data, SocketId, AppId, ChannelName) ->
   A = "{\"event\": \"" ++ binary_to_list(Name),
   B = A ++ "\", \"data\": {",
@@ -46,14 +31,6 @@ make_event_response(Name, Data, SocketId, AppId, ChannelName) ->
   G = F ++ binary_to_list(SocketId),
   H = G ++ "\"",
   G ++ "\"}".
-
-event(Name, Data, SocketId, AppId, ChannelName, Req) ->
-  Message = make_event_response(Name, Data, SocketId, AppId, ChannelName),
-  gproc:send({p, l, ChannelName}, Message),
-  cowboy_req:reply(200, [{<<"content-encoding">>, <<"utf-8">>}], <<"ok">>, Req);
-
-event(_, _, _, _, _, Req) ->
-  cowboy_req:reply(400, [], <<"Missing echo parameter.">>, Req).
 
 terminate(_Req, _State) ->
   ok.

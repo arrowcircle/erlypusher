@@ -11,8 +11,6 @@ init({_Any, http}, Req, []) ->
     {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
   end.
 
-% init(_Any, _Req, _Opt) ->
-%     {upgrade, protocol, cowboy_http_websocket}.
 make_ok_connection_response(Socket_id) ->
     Temp = "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ Socket_id,
     Temp ++ "\"}}".
@@ -24,9 +22,6 @@ make_ok_subscribe_channel_response(Channel_name) ->
 
 make_ok_ping_response() ->
   "{\"event\": \"pusher:pong\", \"data\": {}}".
-
-make_ok_pong_response() ->
-  "{\"event\": \"pusher:ping\", \"data\": {}}".
 
 get_channel_name(Data) ->
   {struct, Json} = mochijson2:decode(binary_to_list(Data)),
