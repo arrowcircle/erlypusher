@@ -6,7 +6,6 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  %io:format("~p~n", [Req]),
   {AppId, Req2} = cowboy_http_req:binding(app_id, Req),
   {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req, <<"">>),
   {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req, <<"">>),
