@@ -11,6 +11,11 @@ handle(Req, State) ->
   {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req, <<"">>),
   {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req, <<"">>),
   {EventSocket, _} = cowboy_http_req:qs_val(<<"socket_id">>, Req, <<"">>),
+  if EventName =:= <<"">> ->
+    {ok, Req5} = cowboy_http_req:reply(400, [], [], Req),
+    {ok, Req5, State};
+    true -> always_true
+  end,
   io:format("~p | ~p | ~p~n", [EventName, EventData, EventSocket]),
   {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
   Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
