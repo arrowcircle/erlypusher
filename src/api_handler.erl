@@ -20,9 +20,8 @@ handle(Req, State) ->
   {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
   Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
   gproc:send({p, l, ChannelName}, Message),
-  io:format("~p~n", [Message]),
-  % {ok, Req3} = cowboy_req:reply(200, [], <<Message>>, Req2),
-  {ok, Req4} = cowboy_http_req:reply(200, [], [<<"Got it\nChannel: ">>, ChannelName, <<"\n">>, <<"App_id: ">>, AppId], Req3),
+
+  {ok, Req4} = cowboy_http_req:reply(200, [], [<<"ok">>], Req3),
   {ok, Req4, State}.
 
 maybe_event(_, true, Req) ->
@@ -38,7 +37,6 @@ maybe_event(<<"POST">>, false, Req) ->
   cowboy_req:reply(400, Req);
 
 maybe_event(_, _, Req) ->
-  %% Method not allowed.
   cowboy_req:reply(405, Req).
 
 make_event_response(Name, Data, SocketId, AppId, ChannelName) ->
