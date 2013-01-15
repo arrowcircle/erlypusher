@@ -13,8 +13,9 @@ start(_StartType, _StartArgs) ->
     cowboy:start_listener(whatever, 5, cowboy_tcp_transport, [{port, 8081}], cowboy_http_protocol,
         [{dispatch,[
                     {'_',[
-                           {[<<"app">>, app_id], websocket_handler, []},
-                           {[], main_page, []}
+                           {[<<"app">>, '_'], websocket_handler, []},
+                           {[], main_page, []},
+                           {[<<"apps">>, '_', <<"channels">>, '_', <<"events">>], api_handler, []}
                          ]}
                    ]}]
     ),

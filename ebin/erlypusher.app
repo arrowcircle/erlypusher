@@ -5,5 +5,5 @@
               {applications,[kernel,stdlib,cowboy]},
               {mod,{erlypusher_app,[]}},
               {env,[]},
-              {modules,[erlypusher,erlypusher_app,erlypusher_sup,main_page,
-                        mochijson2,uuid,websocket_handler]}]}.
+              {modules,[api_handler,erlypusher,erlypusher_app,erlypusher_sup,
+                        main_page,mochijson2,uuid,websocket_handler]}]}.
