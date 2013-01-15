@@ -8,9 +8,9 @@ init({_Any, http}, Req, []) ->
 handle(Req, State) ->
   %io:format("~p~n", [Req]),
   {AppId, Req2} = cowboy_http_req:binding(app_id, Req),
-  {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req),
-  {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req),
-  {EventSocket, _} = cowboy_http_req:qs_val(<<"socket_id">>, Req),
+  {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req, <<"">>),
+  {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req, <<"">>),
+  {EventSocket, _} = cowboy_http_req:qs_val(<<"socket_id">>, Req, <<"">>),
   io:format("~p | ~p | ~p~n", [EventName, EventData, EventSocket]),
   {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
   Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
