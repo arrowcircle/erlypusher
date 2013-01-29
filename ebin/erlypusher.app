@@ -6,4 +6,6 @@
               {mod,{erlypusher_app,[]}},
               {env,[]},
               {modules,[api_handler,erlypusher,erlypusher_app,erlypusher_sup,
-                        main_page,mochijson2,uuid,websocket_handler]}]}.
+                        json_responder,main_page,mochijson2,request_parser,
+                        test_json_responder,uuid,websocket_handler,
+                        websocket_responder]}]}.
