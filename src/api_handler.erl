@@ -17,7 +17,7 @@ handle(Req, State) ->
   end,
   {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
   Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
-  gproc:send({p, l, ChannelName}, Message),
+  gproc:send({p, g, ChannelName}, Message),
   {ok, Req4} = cowboy_http_req:reply(200, [], [<<"ok">>], Req3),
   {ok, Req4, State}.
 
