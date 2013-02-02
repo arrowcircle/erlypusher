@@ -15,13 +15,13 @@ init({_Any, http}, Req, []) ->
 
 respond_to_action(<<"pusher:subscribe">>, Data, _) ->
   ChannelName = request_parser:get_channel_name(Data),
-  gproc:reg({p, l, ChannelName}),
+  gproc:reg({p, g, ChannelName}),
   json_responder:respose({ok_common_channel, ChannelName});
 
 respond_to_action(<<"pusher:unsubscribe">>, Data, Req) ->
   ChannelName = request_parser:get_channel_name(Data),
   Pid = request_parser:get_pid_from_req(Req),
-  gproc:unreg({p, l, ChannelName}, Pid),
+  gproc:unreg({p, g, ChannelName}, Pid),
   json_responder:respose({ok_common_channel, ChannelName});
 
 respond_to_action(<<"pusher:ping">>, _Data, _Req) ->
