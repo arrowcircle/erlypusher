@@ -7,5 +7,5 @@
               {env,[]},
               {modules,[api_handler,erlypusher,erlypusher_app,erlypusher_sup,
                         json_responder,main_page,mochijson2,request_parser,
-                        test_json_responder,uuid,websocket_handler,
-                        websocket_responder]}]}.
+                        test_json_responder,test_request_parser,uuid,
+                        websocket_handler,websocket_responder]}]}.
