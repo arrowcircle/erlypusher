@@ -16,7 +16,7 @@ init({_Any, http}, Req, []) ->
 respond_to_action(<<"pusher:subscribe">>, Data, _) ->
   ChannelName = request_parser:get_channel_name(Data),
   gproc:reg({p, g, ChannelName}),
-  json_responder:respose({ok_common_channel, ChannelName});
+  json_responder:response({ok_common_channel, ChannelName});
 
 respond_to_action(<<"pusher:unsubscribe">>, Data, Req) ->
   ChannelName = request_parser:get_channel_name(Data),
@@ -34,8 +34,7 @@ respond_to_request(Data, Req) ->
 websocket_init(_Any, Req, _Opt) ->
   SocketId = uuid:to_string(uuid:v4()),
   Pid = request_parser:get_pid_from_req(Req),
-  io:format("~p~n", [json_responder:respose({ok_connection, "hop"})]),
-  % Pid ! json_responder:respose({ok_connection, SocketId}),
+  Pid ! json_responder:response({ok_connection, SocketId}),
   {ok, Req, undefined, hibernate}.
 
 websocket_handle({text, Data}, Req, State) ->

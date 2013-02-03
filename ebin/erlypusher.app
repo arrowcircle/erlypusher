@@ -2,7 +2,7 @@
              [{description,[]},
               {vsn,"1"},
               {registered,[]},
-              {applications,[kernel,stdlib,cowboy]},
+              {applications,[kernel,stdlib,cowboy,gproc]},
               {mod,{erlypusher_app,[]}},
               {env,[]},
               {modules,[api_handler,erlypusher,erlypusher_app,erlypusher_sup,
