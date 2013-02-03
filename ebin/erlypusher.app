@@ -5,7 +5,8 @@
               {applications,[kernel,stdlib,cowboy,gproc]},
               {mod,{erlypusher_app,[]}},
               {env,[]},
-              {modules,[api_handler,erlypusher,erlypusher_app,erlypusher_sup,
-                        json_responder,main_page,mochijson2,request_parser,
+              {modules,[api_handler,authenticator,erlypusher,erlypusher_app,
+                        erlypusher_sup,hmac256,json_responder,main_page,
+                        mochijson2,request_parser,sha2,test_authenticator,
                         test_json_responder,test_request_parser,uuid,
                         websocket_handler,websocket_responder]}]}.

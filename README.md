@@ -7,6 +7,7 @@ Erlang server for pusher app
 
 
 * Temp info
+
     def authentication_string(socket_id, custom_string = nil)
       if socket_id.nil? || socket_id.empty?
         raise Error, "Invalid socket_id #{socket_id}"
