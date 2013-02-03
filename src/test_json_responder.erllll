@@ -1,8 +1,0 @@
--module(test_json_responder).
-
--include_lib("eunit/include/eunit.hrl").
-
--define(OK_CONNECTION, "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"ABCDEF\"}}").
-
-generate_json_responder_tests_() ->
-  [?_assertEqual(?OK_CONNECTION, json_responder:respose({ok_connection, "ABCDEF"}))].
