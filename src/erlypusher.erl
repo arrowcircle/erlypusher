@@ -8,6 +8,7 @@
 %% API.
 
 start() ->
+    net_adm:world(),
     application:start(cowboy),
     application:start(gproc),
     application:start(erlypusher).

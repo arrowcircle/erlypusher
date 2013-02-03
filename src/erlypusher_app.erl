@@ -14,7 +14,8 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    cowboy:start_listener(whatever, 5, cowboy_tcp_transport, [{port, 8081}], cowboy_http_protocol,
+    {ok, [[Port|_]|_]} = init:get_argument(port),
+    cowboy:start_listener(whatever, 5, cowboy_tcp_transport, [{port, list_to_integer(Port)}], cowboy_http_protocol,
         [{dispatch,[
                     {'_',[
                            {[<<"app">>, '_'], websocket_handler, []},

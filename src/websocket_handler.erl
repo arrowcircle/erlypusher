@@ -25,7 +25,7 @@ respond_to_action(<<"pusher:unsubscribe">>, Data, Req) ->
   json_responder:respose({ok_common_channel, ChannelName});
 
 respond_to_action(<<"pusher:ping">>, _Data, _Req) ->
-  json_responder:respose({ping}).
+  json_responder:response({ping}).
 
 respond_to_request(Data, Req) ->
   ActionName = request_parser:get_action_name(Data),
