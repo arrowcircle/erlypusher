@@ -4,4 +4,5 @@ deps
 *.beam
 *.plt
 erl_crash.dump
+/gproc*
 
