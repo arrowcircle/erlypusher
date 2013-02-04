@@ -14,6 +14,7 @@ init({_Any, http}, Req, []) ->
   end.
 
 respond_to_action(<<"pusher:subscribe">>, Data, _) ->
+% {"event":"pusher:subscribe","data":{"channel":"private-MY_CHANNEL","auth":"9ba776377551a1d716b8:329329be89573affd6895f3026a19913f0d2712e95d313830fbb45160dfc3e90"}}
   ChannelName = request_parser:get_channel_name(Data),
   gproc:reg({p, g, ChannelName}),
   json_responder:response({ok_common_channel, ChannelName});

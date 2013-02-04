@@ -6,9 +6,7 @@ response({ok_connection, SocketId}) ->
   "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ SocketId ++ "\"}}";
 
 response({ok_common_channel, ChannelName}) ->
-  A = "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"",
-  B = A ++ binary_to_list(ChannelName) ++ "\"}",
-  B;
+  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelName) ++ "\"}";
 
 response({ping}) ->
   "{\"event\": \"pusher:pong\", \"data\": {}}";
