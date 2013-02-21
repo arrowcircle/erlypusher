@@ -16,6 +16,9 @@ get_config() ->
     undefined -> []
   end.
 
+prepare_config() ->
+  parse_config(load_config(lookup_config())).
+
 lookup_config() ->
   case os:getenv("ERLYPUSHER_CONFIG") of
     false ->
@@ -36,9 +39,8 @@ lookup_config() ->
       end
   end.
 
-load_config(Path) ->
-  {ok, Json} = file:read_file(Path),
-  case jiffy:decode(Json) of
+load_config(File) ->
+  case jiffy:decode(File) of
     {Json} ->
       Json;
     {error, Error} ->
@@ -46,21 +48,33 @@ load_config(Path) ->
   end.
 
 parse_config(Json) ->
-  Dict = dict:new(),
-  {Arr} = Json,
-  parse_config_element(Arr, Dict).
+  AppIds = Dict = dict:new(),
+  AppKeys = Dict = dict:new(),
+  parse_config_element(Json, AppIds, AppKeys).
 
-parse_config_element(Config, Dict) ->
-  io:format("dict is ~p\n", [Dict]),
-  [Elem | NewConfig] = Config,
-  case NewConfig of
+parse_info(El) ->
+  {AppName, InfoHash} = El,
+  {[{<<"app_id">>, AppId}|KeySecretArr]} = InfoHash,
+  [{<<"key">>, Key}|SecretArr] = KeySecretArr,
+  [{<<"secret">>, Secret}]= SecretArr,
+  {AppId, Key, Secret, AppName}.
+
+parse_config_element(Config, AppIds, AppKeys) ->
+  case Config of
     [] ->
-      Dict;
-    [_] ->
-      {AppName, {AppInfo}} = Elem,
-      [{<<"app_id">>, AppId}|AppKeyAndSecret] = AppInfo,
-      [{<<"key">>, Key}|AppSecretTuple] = AppKeyAndSecret,
-      [{<<"secret">>, Secret}|_]= AppSecretTuple,
-      NewDict = dict:append(AppId, {Key, Secret, AppName}, Dict),
-      parse_config_element(NewConfig, NewDict)
+      [AppIds, AppKeys];
+    [Elem | NewConfig] ->
+      [Elem | NewConfig] = Config,
+      io:format("\n\n~p\n~p\n", [Config, NewConfig]),
+      {AppId, Key, Secret, AppName} = parse_info(Elem),
+      NewAppIds = dict:store(AppId, {Key, Secret, AppName}, AppIds),
+      NewAppKeys = dict:store(Key, {AppId, Secret, AppName}, AppKeys),
+      parse_config_element(NewConfig, NewAppIds, NewAppKeys);
+    {Array} ->
+      parse_config_element(Array, AppIds, AppKeys);
+    _ ->
+      {AppId, Key, Secret, AppName} = parse_info(Config),
+      NewAppIds = dict:store(AppId, {Key, Secret, AppName}, AppIds),
+      NewAppKeys = dict:store(Key, {AppId, Secret, AppName}, AppKeys),
+      [NewAppIds, NewAppKeys]
   end.
