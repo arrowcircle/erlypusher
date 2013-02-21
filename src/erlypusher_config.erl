@@ -16,16 +16,17 @@ lookup_config() ->
   case os:getenv("ERLYPUSHER_CONFIG") of
     false ->
       ConfigPaths = [".", "/etc/erlypusher"],
-      case file:path_consult(ConfigPaths, "erlypusher.conf") of
-        {ok, Env1, ConfigPath} ->
-          {ok, Env1, ConfigPath};
+      case file:path_open(ConfigPaths, "erlypusher.conf", [raw, read, read_ahead]) of
+        {ok, _, Path} ->
+          {ok, Json} = file:read_file(Path),
+          Json;
         {error, Error} ->
           {error, Error}
       end;
     Path ->
-      case file:consult(Path) of
-        {ok, Env} ->
-          {ok, Env, Path};
+      case file:read_file(Path) of
+        {ok, Json} ->
+          Json;
         {error, Error} ->
           {error, Error}
       end
