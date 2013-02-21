@@ -3,6 +3,10 @@
 
 -export([]).
 
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
+
 set_config(Config) ->
   application:set_env(erlypusher, config, Config).
 
@@ -42,9 +46,21 @@ load_config(Path) ->
   end.
 
 parse_config(Json) ->
-  Dict = dict:new().
-  % parse_config_element(Json, Dict).
+  Dict = dict:new(),
+  {Arr} = Json,
+  parse_config_element(Arr, Dict).
 
-% parse_config_element(Config, Dict) ->
-%   [Elem | NewConfig] = Config,
-%   pase_config_element(NewConfig, dict:append(Dict, Elem)).
+parse_config_element(Config, Dict) ->
+  io:format("dict is ~p\n", [Dict]),
+  [Elem | NewConfig] = Config,
+  case NewConfig of
+    [] ->
+      Dict;
+    [_] ->
+      {AppName, {AppInfo}} = Elem,
+      [{<<"app_id">>, AppId}|AppKeyAndSecret] = AppInfo,
+      [{<<"key">>, Key}|AppSecretTuple] = AppKeyAndSecret,
+      [{<<"secret">>, Secret}|_]= AppSecretTuple,
+      NewDict = dict:append(AppId, {Key, Secret, AppName}, Dict),
+      parse_config_element(NewConfig, NewDict)
+  end.

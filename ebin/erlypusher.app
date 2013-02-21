@@ -9,5 +9,6 @@
                         erlypusher,erlypusher_app,erlypusher_config,
                         erlypusher_sup,hmac,hmac256,json_responder,main_page,
                         mochijson2,request_parser,sha2,test_authenticator,
-                        test_json_responder,test_request_parser,uuid,
-                        websocket_handler,websocket_responder]}]}.
+                        test_erlypusher_config,test_json_responder,
+                        test_request_parser,uuid,websocket_handler,
+                        websocket_responder]}]}.
