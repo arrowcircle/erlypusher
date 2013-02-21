@@ -1,22 +1,24 @@
 -module(erlypusher_config).
--compile(export_all).
 
--export([]).
+-export([prepare/0, app_by_id/1, app_by_key/1]).
 
 -ifdef(TEST).
+-compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 -endif.
+
+app_by_id(Id) ->
+  {ok, Dict} = application:get_env(erlypusher, app_ids),
+  dict:find(Id, Dict).
+
+app_by_key(Key) ->
+  {ok, Dict} = application:get_env(erlypusher, app_keys),
+  dict:find(Key, Dict).
 
 set({AppIds, AppKeys}) ->
   application:set_env(erlypusher, app_ids, AppIds),
   application:set_env(erlypusher, app_keys, AppKeys),
   ok.
-
-get() ->
-  case application:get_env(erlypusher, config) of
-    {ok, Config} -> Config;
-    undefined -> []
-  end.
 
 prepare() ->
   [AppIds, AppKeys] = parse(load(lookup())),

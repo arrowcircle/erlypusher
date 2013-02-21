@@ -9,6 +9,7 @@
 
 start() ->
     net_adm:world(),
+    erlypusher_config:prepare(),
     application:start(cowboy),
     application:start(gproc),
     application:start(erlypusher).
