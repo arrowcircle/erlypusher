@@ -36,9 +36,9 @@ load_config(Path) ->
   jiffy:decode(Json).
 
 parse_config(Json) ->
-  Dict = dict:new(),
-  parse_config_element(Json, Dict).
+  Dict = dict:new().
+  % parse_config_element(Json, Dict).
 
-parse_config_element(Config, Dict) ->
-  [Elem | NewConfig] = Config,
-  pase_config_element(NewConfig, dict:append(Dict, Elem)).
+% parse_config_element(Config, Dict) ->
+%   [Elem | NewConfig] = Config,
+%   pase_config_element(NewConfig, dict:append(Dict, Elem)).
