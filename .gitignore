@@ -7,8 +7,8 @@ erl_crash.dump
 /gproc*
 gproc_dist_erlypusher@railspro
 gproc_dist_erlypusher@railspro2
-Gemfile
-Guardfile
-Gemfile.lock
-/config.json
+/Gemfile
+/Guardfile
+/Gemfile.lock
+/erlypusher.conf
 .rvmrc
