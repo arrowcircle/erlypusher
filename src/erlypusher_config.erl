@@ -34,7 +34,12 @@ lookup_config() ->
 
 load_config(Path) ->
   {ok, Json} = file:read_file(Path),
-  jiffy:decode(Json).
+  case jiffy:decode(Json) of
+    {Json} ->
+      Json;
+    {error, Error} ->
+      {error, Error}
+  end.
 
 parse_config(Json) ->
   Dict = dict:new().
