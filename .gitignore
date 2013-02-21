@@ -10,4 +10,5 @@ gproc_dist_erlypusher@railspro2
 Gemfile
 Guardfile
 Gemfile.lock
+/config.json
 .rvmrc
