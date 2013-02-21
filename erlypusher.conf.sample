@@ -1,7 +1,13 @@
 {
-  "app_name": {
-    "app_id": "123456",
-    "key": "123456",
-    "secret": "123456"
+  "app_name1": {
+    "app_id": "appid1",
+    "key": "key1",
+    "secret": "secret1"
+  },
+
+  "app_name2": {
+    "app_id": "appid2",
+    "key": "key2",
+    "secret": "secret2"
   }
 }

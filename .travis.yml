@@ -3,3 +3,5 @@ otp_release:
    - R15B02
 notifications:
   email: false
+before_script:
+  - cp erlypusher.conf.sample erlypusher.config

@@ -7,20 +7,23 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
-set_config(Config) ->
-  application:set_env(erlypusher, config, Config).
+set({AppIds, AppKeys}) ->
+  application:set_env(erlypusher, app_ids, AppIds),
+  application:set_env(erlypusher, app_keys, AppKeys),
+  ok.
 
-get_config() ->
+get() ->
   case application:get_env(erlypusher, config) of
     {ok, Config} -> Config;
     undefined -> []
   end.
 
-prepare_config() ->
-  parse_config(load_config(lookup_config())).
+prepare() ->
+  [AppIds, AppKeys] = parse(load(lookup())),
+  set({AppIds, AppKeys}).
 
-lookup_config() ->
-  case os:getenv("ERLYPUSHER_CONFIG") of
+lookup() ->
+  case os:getenv("ERLYPUSHER") of
     false ->
       ConfigPaths = [".", "/etc/erlypusher"],
       case file:path_open(ConfigPaths, "erlypusher.conf", [raw, read, read_ahead]) of
@@ -39,7 +42,7 @@ lookup_config() ->
       end
   end.
 
-load_config(File) ->
+load(File) ->
   case jiffy:decode(File) of
     {Json} ->
       Json;
@@ -47,10 +50,10 @@ load_config(File) ->
       {error, Error}
   end.
 
-parse_config(Json) ->
-  AppIds = Dict = dict:new(),
-  AppKeys = Dict = dict:new(),
-  parse_config_element(Json, AppIds, AppKeys).
+parse(Json) ->
+  AppIds = dict:new(),
+  AppKeys = dict:new(),
+  parse_element(Json, AppIds, AppKeys).
 
 parse_info(El) ->
   {AppName, InfoHash} = El,
@@ -59,19 +62,18 @@ parse_info(El) ->
   [{<<"secret">>, Secret}]= SecretArr,
   {AppId, Key, Secret, AppName}.
 
-parse_config_element(Config, AppIds, AppKeys) ->
+parse_element(Config, AppIds, AppKeys) ->
   case Config of
     [] ->
       [AppIds, AppKeys];
     [Elem | NewConfig] ->
       [Elem | NewConfig] = Config,
-      io:format("\n\n~p\n~p\n", [Config, NewConfig]),
       {AppId, Key, Secret, AppName} = parse_info(Elem),
       NewAppIds = dict:store(AppId, {Key, Secret, AppName}, AppIds),
       NewAppKeys = dict:store(Key, {AppId, Secret, AppName}, AppKeys),
-      parse_config_element(NewConfig, NewAppIds, NewAppKeys);
+      parse_element(NewConfig, NewAppIds, NewAppKeys);
     {Array} ->
-      parse_config_element(Array, AppIds, AppKeys);
+      parse_element(Array, AppIds, AppKeys);
     _ ->
       {AppId, Key, Secret, AppName} = parse_info(Config),
       NewAppIds = dict:store(AppId, {Key, Secret, AppName}, AppIds),

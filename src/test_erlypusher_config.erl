@@ -45,5 +45,5 @@ gen_test_config_complex_res() ->
 
 generate_erlypusher_config_test_() ->
   [?_assertEqual(?TEST_CONFIG_ELEM_RES, erlypusher_config:parse_info(?TEST_CONFIG_ELEM)),
-   ?_assertEqual(?TEST_CONFIG_SIMPLE_RES, erlypusher_config:parse_config(?TEST_CONFIG_SIMPLE)),
-   ?_assertEqual(?TEST_CONFIG_COMPLES_RES, erlypusher_config:parse_config(?TEST_CONFIG_COMPLEX))].
+   ?_assertEqual(?TEST_CONFIG_SIMPLE_RES, erlypusher_config:parse(?TEST_CONFIG_SIMPLE)),
+   ?_assertEqual(?TEST_CONFIG_COMPLES_RES, erlypusher_config:parse(?TEST_CONFIG_COMPLEX))].
