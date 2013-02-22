@@ -33,10 +33,17 @@ respond_to_request(Data, Req) ->
   respond_to_action(ActionName, Data, Req).
 
 websocket_init(_Any, Req, _Opt) ->
+  % check if app_id and key exist
   SocketId = uuid:to_string(uuid:v4()),
   Pid = request_parser:get_pid_from_req(Req),
-  Pid ! json_responder:response({ok_connection, SocketId}),
-  {ok, Req, undefined, hibernate}.
+  {AppKey, Req2} = cowboy_http_req:binding(key, Req),
+  case erlypusher_config:app_by_key(AppKey) of
+    {ok, _} ->
+      Pid ! json_responder:response({ok_connection, SocketId});
+    error ->
+      Pid ! json_responder:response({error_no_app, AppKey})
+  end,
+  {ok, Req2, undefined, hibernate}.
 
 websocket_handle({text, Data}, Req, State) ->
   Resp = respond_to_request(Data, Req),

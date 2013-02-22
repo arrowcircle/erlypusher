@@ -7,6 +7,12 @@ init({_Any, http}, Req, []) ->
 
 handle(Req, State) ->
   {AppId, Req2} = cowboy_http_req:binding(app_id, Req),
+  case erlypusher_config:app_by_id(AppId) of
+    error ->
+      ok;
+    {ok, _} ->
+      ok
+  end,
   {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req, <<"">>),
   {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req, <<"">>),
   {EventSocket, _} = cowboy_http_req:qs_val(<<"socket_id">>, Req, <<"">>),

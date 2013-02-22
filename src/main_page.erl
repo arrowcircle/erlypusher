@@ -20,7 +20,7 @@ handle(Req, State) ->
       Pusher.log = function(data) {
         console.log('\t\t', data);
       };
-      var pusher = new Pusher('765ec374ae0a69f4ce44');
+      var pusher = new Pusher('key1');
       pusher.bind('pusher:error', function(data) { console.log(data.to_json) })
       var myChannel = pusher.subscribe('MY_CHANNEL');
       myChannel.bind('an_event', function(data) { console.log(data) })
