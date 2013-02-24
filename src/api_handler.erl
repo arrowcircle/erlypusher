@@ -6,26 +6,26 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  {AppId, Req2} = cowboy_http_req:binding(app_id, Req),
+  {AppId, Req2} = cowboy_req:binding(app_id, Req),
   case erlypusher_config:app_by_id(AppId) of
     error ->
       ok;
     {ok, _} ->
       ok
   end,
-  {EventName, _} = cowboy_http_req:qs_val(<<"name">>, Req, <<"">>),
-  {EventData, _} = cowboy_http_req:qs_val(<<"data">>, Req, <<"">>),
-  {EventSocket, _} = cowboy_http_req:qs_val(<<"socket_id">>, Req, <<"">>),
-  if EventName =:= <<"">> ->
-    {ok, Req5} = cowboy_http_req:reply(400, [], [], Req),
-    {ok, Req5, State};
-    true -> always_true
+  {EventName, Req3} = cowboy_req:qs_val(<<"name">>, Req2, <<"">>),
+  {EventData, Req4} = cowboy_req:qs_val(<<"data">>, Req3, <<"">>),
+  {EventSocket, Req5} = cowboy_req:qs_val(<<"socket_id">>, Req4, <<"">>),
+  {ChannelName, Req6} = cowboy_req:binding(channel_id, Req5),
+  case EventName of
+    <<"">> ->
+      {ok, Req7} = cowboy_req:reply(400, [], [], Req);
+    EventName ->
+      Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
+      gproc:send({p, g, ChannelName}, Message),
+      {ok, Req7} = cowboy_req:reply(200, [], [<<"ok">>], Req6)
   end,
-  {ChannelName, Req3} = cowboy_http_req:binding(channel_id, Req2),
-  Message = make_event_response(EventName, EventData, EventSocket, AppId, ChannelName),
-  gproc:send({p, g, ChannelName}, Message),
-  {ok, Req4} = cowboy_http_req:reply(200, [], [<<"ok">>], Req3),
-  {ok, Req4, State}.
+  {ok, Req7, State}.
 
 make_event_response(Name, Data, SocketId, AppId, ChannelName) ->
   A = "{\"event\": \"" ++ binary_to_list(Name),

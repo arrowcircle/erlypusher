@@ -6,7 +6,7 @@ init({_Any, http}, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  {ok, Req2} = cowboy_http_req:reply(200, [], <<"
+  {ok, Req2} = cowboy_req:reply(200, [], <<"
 <!DOCTYPE html>
 <html>
   <head>

@@ -9,7 +9,7 @@
 
 generate_json_responder_test_() ->
   [?_assertEqual(?OK_CONNECTION, json_responder:response({ok_connection, "ABCDEF"})),
-   ?_assertEqual(?OK_COMMON_CHANNEL, json_responder:response({ok_common_channel, <<"test channel">>})),
+   ?_assertEqual(?OK_COMMON_CHANNEL, json_responder:response({ok_channel, <<"test channel">>})),
    ?_assertEqual(?OK_PING, json_responder:response({ping})),
    ?_assertEqual(ok, json_responder:response(any_shit)),
    ?_assertEqual(ok, json_responder:response()),
