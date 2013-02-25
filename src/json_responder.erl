@@ -19,7 +19,7 @@ response({ping}) ->
 % errors
 
 response({error_no_app, AppId}) ->
-  "{\"type\":\"PusherError\",\"data\":{\"code\":4001,\"message\":\"Could not find app by key " ++ binary_to_list(AppId) ++ "\"}}";
+  "{\"event\":\"pusher:error\",\"data\":{\"code\":4001,\"message\":\"Could not find app by key " ++ binary_to_list(AppId) ++ "\"}}";
 
 response(_Any) ->
   ok.

@@ -7,7 +7,7 @@
   websocket_info/3, websocket_terminate/3]).
 
 init({tcp, http}, _Req, _Opts) ->
-    {upgrade, protocol, cowboy_websocket}.
+  {upgrade, protocol, cowboy_websocket}.
 
 respond_to_action(<<"pusher:subscribe">>, Data, Req) ->
 % {"event":"pusher:subscribe","data":{"channel":"private-MY_CHANNEL","auth":"9ba776377551a1d716b8:329329be89573affd6895f3026a19913f0d2712e95d313830fbb45160dfc3e90"}}
@@ -38,14 +38,8 @@ websocket_init(_Any, Req, _Opt) ->
   % check if app_id and key exist
   SocketId = uuid:to_string(uuid:v4()),
   Pid = request_parser:get_pid_from_req(Req),
-  {AppKey, Req2} = cowboy_req:binding(key, Req),
-  case erlypusher_config:app_by_key(AppKey) of
-    {ok, _} ->
-      Pid ! json_responder:response({ok_connection, SocketId});
-    error ->
-      Pid ! json_responder:response({error_no_app, AppKey})
-  end,
-  {ok, Req2, undefined_state}.
+  Pid ! json_responder:response({ok_connection, SocketId}),
+  {ok, Req, undefined_state}.
 
 websocket_handle({text, Data}, Req, State) ->
   Resp = respond_to_request(Data, Req),

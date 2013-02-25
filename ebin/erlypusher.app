@@ -5,10 +5,11 @@
               {applications,[kernel,stdlib,cowboy,gproc]},
               {mod,{erlypusher_app,[]}},
               {env,[]},
-              {modules,[api_handler,apps,apps_server,authenticator,erlsha2,
-                        erlypusher,erlypusher_app,erlypusher_config,
-                        erlypusher_sup,hmac,hmac256,json_responder,main_page,
-                        mochijson2,request_parser,sha2,test_authenticator,
+              {modules,[api_handler,api_middleware,apps,apps_server,
+                        authenticator,erlsha2,erlypusher,erlypusher_app,
+                        erlypusher_config,erlypusher_sup,hmac,hmac256,
+                        json_responder,main_page,middleware,mochijson2,
+                        request_parser,sha2,test_authenticator,
                         test_erlypusher_config,test_json_responder,
                         test_request_parser,uuid,websocket_handler,
-                        websocket_responder]}]}.
+                        websocket_middleware,websocket_responder]}]}.

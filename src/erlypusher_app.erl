@@ -15,7 +15,6 @@
 
 start(_StartType, _StartArgs) ->
     {ok, [[Port|_]|_]} = init:get_argument(port),
-    WsPath =
     Dispatch = cowboy_router:compile([
                     %% {HostMatch, list({PathMatch, Handler, Opts})}
                     {'_', [{"/app/:key", websocket_handler, []},
@@ -25,7 +24,9 @@ start(_StartType, _StartArgs) ->
                 ]),
     cowboy:start_http(my_http_listener, 100,
         [{port, list_to_integer(Port)}],
-        [{env, [{dispatch, Dispatch}]}]
+        [{env, [{dispatch, Dispatch}]},
+         {middlewares, [cowboy_router, middleware, cowboy_handler]}
+        ]
     ),
     erlypusher_sup:start_link().
 
