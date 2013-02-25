@@ -30,7 +30,7 @@ make_event_response(Name, Data, SocketId, ChannelName) ->
   jiffy:encode({[{<<"event">>, Name},
                  {<<"data">>, Data},
                  {<<"channel">>, ChannelName},
-                 {<<"socket_id">>, SocketId}]}),
+                 {<<"socket_id">>, SocketId}]}).
 
 terminate(_Reason, _Req, _State) ->
   ok.

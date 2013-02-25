@@ -7,6 +7,7 @@ Erlang server for pusher app
 
 # To-do
 * Private channels subscriptions
+* middleware to filter by id and key
 * Use jiffy for json parse and generation
 * Presence channels subscriptions with lists of presence
 * Init script for linux systems

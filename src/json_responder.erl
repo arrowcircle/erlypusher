@@ -3,9 +3,14 @@
 -export([response/0, response/1]).
 
 response({ok_connection, SocketId}) ->
+  % jiffy:encode({[{<<"event">>, <<"pusher:connection_established">>},
+                 % {<<"data">>, {[{<<"socket_id">>, SocketId}]}}]});
   "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ SocketId ++ "\"}}";
 
 response({ok_channel, ChannelName}) ->
+  % jiffi:encode({[{<<"event">>, <<"pusher_internal:connection_succeedeed">>},
+  %                {<<"data">>, {[]}},
+  %                {<<"channel">>, ChannelName}]});
   "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelName) ++ "\"}";
 
 response({ping}) ->
