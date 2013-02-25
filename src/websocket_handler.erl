@@ -6,14 +6,20 @@
 -export([websocket_init/3, websocket_handle/3,
   websocket_info/3, websocket_terminate/3]).
 
-init({tcp, http}, Req, Opts) ->
+init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
-respond_to_action(<<"pusher:subscribe">>, Data, _) ->
+respond_to_action(<<"pusher:subscribe">>, Data, Req) ->
 % {"event":"pusher:subscribe","data":{"channel":"private-MY_CHANNEL","auth":"9ba776377551a1d716b8:329329be89573affd6895f3026a19913f0d2712e95d313830fbb45160dfc3e90"}}
-  ChannelName = request_parser:get_channel_name(Data),
-  gproc:reg({p, g, ChannelName}),
-  json_responder:response({ok_channel, ChannelName});
+  {AppKey, _Req2} = cowboy_req:binding(key, Req),
+  case erlypusher_config:app_by_key(AppKey) of
+    error ->
+      ok;
+    {_Key, {AppId, _, _}} ->
+      ChannelName = request_parser:get_channel_name(Data),
+      gproc:reg({p, g, {AppId, ChannelName}}),
+      json_responder:response({ok_channel, ChannelName})
+  end;
 
 respond_to_action(<<"pusher:unsubscribe">>, Data, Req) ->
   ChannelName = request_parser:get_channel_name(Data),
@@ -39,7 +45,7 @@ websocket_init(_Any, Req, _Opt) ->
     error ->
       Pid ! json_responder:response({error_no_app, AppKey})
   end,
-  {ok, Req, undefined_state}.
+  {ok, Req2, undefined_state}.
 
 websocket_handle({text, Data}, Req, State) ->
   Resp = respond_to_request(Data, Req),
