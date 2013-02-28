@@ -19,7 +19,8 @@ start(_StartType, _StartArgs) ->
                     %% {HostMatch, list({PathMatch, Handler, Opts})}
                     {'_', [{"/app/:key", websocket_handler, []},
                            {"/", main_page, []},
-                           {"/apps/:app_id/channels/:channel_id/events", api_handler, []}
+                           % {"/apps/:app_id/channels/:channel_id/events", api_handler, []},
+                           {"/apps/:app_id/events", api_handler, []}
                           ]}
                 ]),
     cowboy:start_http(my_http_listener, 100,

@@ -9,6 +9,7 @@ execute(Req, Env) ->
     websocket_handler ->
       {ok, Req, Env};
     api_handler ->
+      io:format("\n\n\n\n~p\n\n\n\n", [Req]),
       {AppId, Req2} = cowboy_req:binding(app_id, Req),
       case erlypusher_config:app_by_id(AppId) of
         error ->

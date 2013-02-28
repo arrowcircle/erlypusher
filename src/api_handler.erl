@@ -15,14 +15,14 @@ handle(Req, State) ->
   {EventName, Req3} = cowboy_req:qs_val(<<"name">>, Req2, <<"">>),
   {EventData, Req4} = cowboy_req:qs_val(<<"data">>, Req3, <<"">>),
   {EventSocket, Req5} = cowboy_req:qs_val(<<"socket_id">>, Req4, <<"">>),
-  {ChannelName, Req6} = cowboy_req:binding(channel_id, Req5),
+  {ChannelName, Req6} = cowboy_req:qs_val(<<"channels">>, Req5),
   case EventName of
     <<"">> ->
       {ok, Req7} = cowboy_req:reply(400, [], [], Req);
     EventName ->
       Message = make_event_response(EventName, EventData, EventSocket, ChannelName),
       gproc:send({p, g, {AppId, ChannelName}}, Message),
-      {ok, Req7} = cowboy_req:reply(200, [], [<<"ok">>], Req6)
+      {ok, Req7} = cowboy_req:reply(202, [], [<<"202 ACCEPTED">>], Req6)
   end,
   {ok, Req7, State}.
 
