@@ -8,8 +8,13 @@
 -endif.
 
 app_by_id(Id) ->
-  {ok, Dict} = application:get_env(erlypusher, app_ids),
-  dict:find(Id, Dict).
+  Env = application:get_env(erlypusher, app_ids),
+  case Env of
+    {ok, Dict} ->
+      dict:find(Id, Dict);
+    undefined ->
+      error
+  end.
 
 app_by_key(Key) ->
   {ok, Dict} = application:get_env(erlypusher, app_keys),

@@ -14,12 +14,17 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    {ok, [[Port|_]|_]} = init:get_argument(port),
+    case init:get_argument(port) of
+      {ok, [[Port|_]|_]} ->
+        ok;
+      _ ->
+        Port = "8080"
+    end,
     Dispatch = cowboy_router:compile([
                     %% {HostMatch, list({PathMatch, Handler, Opts})}
                     {'_', [{"/app/:key", websocket_handler, []},
                            {"/", main_page, []},
-                           % {"/apps/:app_id/channels/:channel_id/events", api_handler, []},
+                           {"/apps/:app_id/channels/:channel_id/events", api_handler, []},
                            {"/apps/:app_id/events", api_handler, []}
                           ]}
                 ]),
@@ -33,10 +38,3 @@ start(_StartType, _StartArgs) ->
 
 stop(_State) ->
     ok.
-
--ifdef(TEST).
-
-simple_test() ->
-    test_json_responder:test().
-
--endif.
