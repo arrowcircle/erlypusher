@@ -49,13 +49,7 @@ app_keys() ->
   dict:store(<<"key1">>, {<<"app1">>, <<"secret1">>, <<"appname">>}, dict:new()).
 
 setup() ->
-  erlypusher_config:set({app_ids(), app_keys()}),
-  application:start(crypto),
-  application:start(ranch),
-  application:start(cowboy),
-  application:start(gproc),
-  application:start(erlypusher).
-
+  erlypusher_config:set({app_ids(), app_keys()}).
 
 clean() ->
   ok.

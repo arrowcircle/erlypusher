@@ -1,7 +1,15 @@
 -module(json_responder).
 
--export([response/0, response/1]).
+-export([response/0, response/1, response/2]).
 
+% api
+
+response(event, {Name, Data, ChannelName}) ->
+  jiffy:encode({[{<<"event">>, Name},
+                 {<<"data">>, Data},
+                 {<<"channel">>, ChannelName}]}).
+
+% ws
 response({ok_connection, SocketId}) ->
   % jiffy:encode({[{<<"event">>, <<"pusher:connection_established">>},
                  % {<<"data">>, {[{<<"socket_id">>, SocketId}]}}]});
