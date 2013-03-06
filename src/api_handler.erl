@@ -32,10 +32,6 @@ get_channles_list(Json) ->
   {[{<<"name">>, _}, {<<"channels">>, Channels},_]} = Json,
   Channels.
 
-% {[{<<"name">>,<<"an_event">>},
-%         {<<"channels">>,[<<"chanelle">>,<<"truba">>,<<"duba">>]},
-%         {<<"data">>,<<"{\"some\":\"data\"}">>}]}
-
 check_channel_array(Req, State, Json, Id) ->
   ChannelsList = get_channles_list(Json),
   case ChannelsList of
@@ -54,40 +50,52 @@ check_channel(Req, State, Json, Id) ->
       response_channels(Req2, State, Json, Id, [ChannelId])
   end.
 
-check_body(Req, State, Id) ->
-  Body = cowboy_req:body(Req),
-  case Body of
-    {ok, Json, Req2} ->
-      BodyJson = jiffy:decode(Json),
-      check_channel(Req2, State, BodyJson, Id);
+check_body(Req, State, Id, Body) ->
+  case jiffy:decode(Body) of
     {error, _Reason} ->
-      no_body(Req, State)
+      no_body(Req, State);
+    Json ->
+      check_channel(Req, State, Json, Id)
   end.
 
-check_signature(Body, AuthKey, AuthSignature, AuthTimestamp, AuthVersion) ->
+check_signature(Req, State, AuthSignature, Body, Key, Secret, Id) ->
+  {ParamsHash, Req2} = cowboy_req:qs_vals(Req),
+  {Method, Req3} = cowboy_req:method(Req2),
+  {Url, Req4} = cowboy_req:path(Req3),
+  case authenticator:signature_check(AuthSignature, ParamsHash, Method, Url, Secret) of
+    ok ->
+      check_body(Req4, State, Id, Body);
+    error ->
+      wrong_secret(Req4, State);
+    timestamp ->
+      wrong_timestamp(Req4, State)
+  end.
+
+check_md5(BodyMD5, Body) ->
+  case authenticator:md5_check(Body, BodyMD5) of
+    ok ->
+      ok;
+    error ->
+      error_md5
+  end.
   % или error_timestamp или error
-  ok.
 
 parse_params(Req) ->
-  {AuthKey, Req2} = cowboy_req:qs_val(<<"auth_key">>, Req),
+  {BodyMD5, Req2} = cowboy_req:qs_val(<<"body_md5">>, Req),
   {AuthSignature, Req3} = cowboy_req:qs_val(<<"auth_signature">>, Req2),
-  {Body, Req4} = cowboy_req:qs_val(<<"body_md5">>, Req3),
-  {AuthTimestamp, Req5} = cowboy_req:qs_val(<<"auth_timestamp">>, Req4),
-  {AuthVersion, Req6} = cowboy_req:qs_val(<<"auth_varsion">>, Req5),
-  {{Body, AuthKey, AuthSignature, AuthTimestamp, AuthVersion}, Req6}.
+  {AuthKey, Req4} = cowboy_req:qs_val(<<"auth_key">>, Req3),
+  {ok, Body, Req5} = cowboy_req:body(Req4),
+  {{BodyMD5, Body, AuthSignature, AuthKey}, Req5}.
 
-check_auth(Req, State, {Id, {Key, Secret, Name}}) ->
-  {{Body, AuthKey, AuthSignature, AuthTimestamp, AuthVersion}, Req2} = parse_params(Req),
+check_auth(Req, State, {Id, {Key, Secret, _Name}}) ->
+  {{BodyMD5, Body, AuthSignature, AuthKey}, Req2} = parse_params(Req),
   case AuthKey of
     Key ->
-      case check_signature(Body, AuthKey, AuthSignature, AuthTimestamp, AuthVersion) of
+      case check_md5(BodyMD5, Body) of
         ok ->
-        % actual code here
-          check_body(Req2, State, Id);
-        error ->
-          wrong_secret(Req2, State);
-        error_timestamp ->
-          wrong_timestamp(Req2, State, AuthTimestamp)
+          check_signature(Req2, State, AuthSignature, Body, Key, Secret, Id);
+        error_md5 ->
+          wrong_md5(Req2, State)
       end;
     _ ->
       wrong_key(Req2, State)
@@ -105,6 +113,10 @@ handle(Req, State) ->
   end.
 
 % Common responses
+
+wrong_md5(Req, State) ->
+  {ok, Req2} = cowboy_req:reply(401, [{<<"content-type">>, <<"application/json">>}], [<<"Wrong MD5">>], Req),
+  {ok, Req2, State}.
 
 wrong_channel(Req, State) ->
   {ok, Req2} = cowboy_req:reply(500, [{<<"content-type">>, <<"application/json">>}], [<<"No channel">>], Req),
@@ -131,7 +143,7 @@ wrong_key(Req, State) ->
   {ok, Req2, State}.
 
 wrong_secret(Req, State) ->
-  {ok, Req2} = cowboy_req:reply(401, [{<<"content-type">>, <<"application/json">>}], [<<"Invalid signature: you should have sent HmacSHA256Hex(\"POST/apps/38128/events\nauth_key=9420a8ef0031a6153350&auth_timestamp=1362068936&auth_version=1.0&body_md5=f526bda6bdd083b269a52680132c1e4c\", your_secret_key), but you sent \"5688f4c254b912be46ad354c77b014bfa0cbd27c0e90a74e07c6143dc3dc7a2b\"">>], Req),
+  {ok, Req2} = cowboy_req:reply(401, [{<<"content-type">>, <<"application/json">>}], [<<"Invalid signature">>], Req),
   {ok, Req2, State}.
 
 terminate(_Reason, _Req, _State) ->

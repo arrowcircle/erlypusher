@@ -6,7 +6,7 @@ erlypusher
 Erlang server for pusher app
 
 # To-do
-* Signature of body check for all http handlers
+* Timestamp check for api
 * Channels handler (info, occupied)
 * Private channels subscriptions
 * Refactor all shit
