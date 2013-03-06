@@ -58,7 +58,7 @@ check_body(Req, State, Id, Body) ->
       check_channel(Req, State, Json, Id)
   end.
 
-check_signature(Req, State, AuthSignature, Body, Key, Secret, Id) ->
+check_signature(Req, State, AuthSignature, Body, Secret, Id) ->
   {ParamsHash, Req2} = cowboy_req:qs_vals(Req),
   {Method, Req3} = cowboy_req:method(Req2),
   {Url, Req4} = cowboy_req:path(Req3),
@@ -66,7 +66,9 @@ check_signature(Req, State, AuthSignature, Body, Key, Secret, Id) ->
     ok ->
       check_body(Req4, State, Id, Body);
     error ->
-      wrong_secret(Req4, State)
+      wrong_secret(Req4, State);
+    {error_timestamp, Timestamp} ->
+      wrong_timestamp(Req4, State, Timestamp)
   end.
 
 check_md5(BodyMD5, Body) ->
@@ -91,7 +93,7 @@ check_auth(Req, State, {Id, {Key, Secret, _Name}}) ->
     Key ->
       case check_md5(BodyMD5, Body) of
         ok ->
-          check_signature(Req2, State, AuthSignature, Body, Key, Secret, Id);
+          check_signature(Req2, State, AuthSignature, Body, Secret, Id);
         error_md5 ->
           wrong_md5(Req2, State)
       end;

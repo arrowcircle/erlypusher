@@ -77,10 +77,18 @@ signature(ParamsHash, Method, Url, Secret) ->
   SignString = authenticator:format_params(ParamsForAuth),
   sign(join_signature_string(Method, Url, SignString), Secret).
 
+timestamp_check(Params) ->
+  ok.
+
 signature_check(Signature, Params, Method, Url, Secret) ->
   case signature(Params, Method, Url, Secret) of
     Signature ->
-      ok;
+      case timestamp_check(Params) of
+        ok ->
+          ok;
+        _ ->
+          error_timestamp
+      end;
     _ ->
       io:format("Wrong Signature: Request Signature: ~p\n Server signature: ~p\n\n", [Signature, signature(Params, Method, Url, Secret)]),
       error
