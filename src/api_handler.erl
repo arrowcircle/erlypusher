@@ -66,9 +66,7 @@ check_signature(Req, State, AuthSignature, Body, Key, Secret, Id) ->
     ok ->
       check_body(Req4, State, Id, Body);
     error ->
-      wrong_secret(Req4, State);
-    timestamp ->
-      wrong_timestamp(Req4, State)
+      wrong_secret(Req4, State)
   end.
 
 check_md5(BodyMD5, Body) ->
