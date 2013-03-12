@@ -2,7 +2,7 @@ all:
 	./rebar compile skip_deps=true
 
 full:
-	./rebar get-deps compile
+	GPROC_DIST=true ./rebar get-deps compile
 
 clean:
 	./rebar clean
