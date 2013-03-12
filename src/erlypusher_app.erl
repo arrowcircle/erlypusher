@@ -14,13 +14,12 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    % Port = application:get_env(erlypusher, port),
     erlypusher_config:prepare(),
-    case init:get_argument(port) of
-      {ok, [[Port|_]|_]} ->
-        ok;
+    case application:get_env(erlypusher, port) of
+      {ok, Port} ->
+        Port;
       _ ->
-        Port = "8080"
+        Port = 8080
     end,
     Dispatch = cowboy_router:compile([
                     %% {HostMatch, list({PathMatch, Handler, Opts})}
@@ -33,7 +32,7 @@ start(_StartType, _StartArgs) ->
                           ]}
                 ]),
     cowboy:start_http(my_http_listener, 100,
-        [{port, list_to_integer(Port)}],
+        [{port, Port}],
         [{env, [{dispatch, Dispatch}]},
          {}
         ]
