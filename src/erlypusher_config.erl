@@ -1,6 +1,6 @@
 -module(erlypusher_config).
 
--export([prepare/0, app_by_id/1, app_by_key/1]).
+-export([prepare/0, app_by_id/1, app_by_key/1, readlines/1]).
 
 -ifdef(TEST).
 -compile(export_all).
@@ -20,33 +20,48 @@ app_by_key(Key) ->
   {ok, Dict} = application:get_env(erlypusher, app_keys),
   dict:find(Key, Dict).
 
-set({AppIds, AppKeys}) ->
+set({AppIds, AppKeys}, Port) ->
   application:set_env(erlypusher, app_ids, AppIds),
   application:set_env(erlypusher, app_keys, AppKeys),
+  application:set_env(erlypusher, port, Port),
   ok.
 
 prepare() ->
-  [AppIds, AppKeys] = parse(load(lookup())),
-  set({AppIds, AppKeys}).
+  {{AppIds, AppKeys}, Port} = parse(load(lookup())),
+  set({AppIds, AppKeys}, Port).
+
+readlines(FileName) ->
+  {ok, Content} = file:read_file(FileName),
+  Content.
 
 lookup() ->
   case os:getenv("ERLYPUSHER") of
     false ->
       ConfigPaths = [".", "/etc/erlypusher"],
-      case file:path_open(ConfigPaths, "erlypusher.conf", [raw, read, read_ahead]) of
-        {ok, _, Path} ->
-          {ok, Json} = file:read_file(Path),
-          Json;
+      case file:path_open(ConfigPaths, "erlypusher.conf", [raw, read, binary]) of
+        {ok, _Device, Path} ->
+          readlines(Path);
         {error, Error} ->
           {error, Error}
       end;
     Path ->
-      case file:read_file(Path) of
-        {ok, Json} ->
-          Json;
-        {error, Error} ->
-          {error, Error}
-      end
+      readlines(Path)
+  end.
+
+extract_port(Json) ->
+  case Json of
+    {[{<<"port">>, Port}|_]} ->
+      Port;
+    [{<<"port">>, Port}|_] ->
+      Port
+  end.
+
+extract_apps(Json) ->
+  case Json of
+    {[_|[{<<"apps">>, AppsJson}|_]]} ->
+      AppsJson;
+    [_|[{<<"apps">>, AppsJson}|_]] ->
+      AppsJson
   end.
 
 load(File) ->
@@ -58,32 +73,32 @@ load(File) ->
   end.
 
 parse(Json) ->
-  AppIds = dict:new(),
-  AppKeys = dict:new(),
-  parse_element(Json, AppIds, AppKeys).
+  Port = extract_port(Json),
+  {parse_apps_array(extract_apps(Json), dict:new(), dict:new()), Port}.
 
 parse_info(El) ->
-  {AppName, InfoHash} = El,
+  case helper:type_of(El) of
+    list ->
+      [{AppName, InfoHash}|_] = El;
+    tuple ->
+      case El of
+        {[{AppName, InfoHash}]} ->
+          ok;
+        {AppName, InfoHash} ->
+          ok
+      end
+  end,
   {[{<<"app_id">>, AppId}|KeySecretArr]} = InfoHash,
   [{<<"key">>, Key}|SecretArr] = KeySecretArr,
   [{<<"secret">>, Secret}]= SecretArr,
   {AppId, Key, Secret, AppName}.
 
-parse_element(Config, AppIds, AppKeys) ->
-  case Config of
+parse_apps_array(AppsArray, AppIds, AppKeys) ->
+  case AppsArray of
     [] ->
-      [AppIds, AppKeys];
-    [Elem | NewConfig] ->
-      [Elem | NewConfig] = Config,
+      {AppIds, AppKeys};
+    [Elem | NewAppsArray] ->
+      % [Elem | NewAppsArray] = AppsArray,
       {AppId, Key, Secret, AppName} = parse_info(Elem),
-      NewAppIds = dict:store(AppId, {Key, Secret, AppName}, AppIds),
-      NewAppKeys = dict:store(Key, {AppId, Secret, AppName}, AppKeys),
-      parse_element(NewConfig, NewAppIds, NewAppKeys);
-    {Array} ->
-      parse_element(Array, AppIds, AppKeys);
-    _ ->
-      {AppId, Key, Secret, AppName} = parse_info(Config),
-      NewAppIds = dict:store(AppId, {Key, Secret, AppName}, AppIds),
-      NewAppKeys = dict:store(Key, {AppId, Secret, AppName}, AppKeys),
-      [NewAppIds, NewAppKeys]
+      parse_apps_array(NewAppsArray, dict:store(AppId, {Key, Secret, AppName}, AppIds), dict:store(Key, {AppId, Secret, AppName}, AppKeys))
   end.

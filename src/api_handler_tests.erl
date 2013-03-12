@@ -42,14 +42,15 @@
 
 -define(NOAPP_RESPONSE, ok).
 
-app_ids() ->
-  dict:store(<<"app1">>, {<<"key1">>, <<"secret1">>, <<"appname">>}, dict:new()).
+% app_ids() ->
+%   dict:store(<<"app1">>, {<<"key1">>, <<"secret1">>, <<"appname">>}, dict:new()).
 
-app_keys() ->
-  dict:store(<<"key1">>, {<<"app1">>, <<"secret1">>, <<"appname">>}, dict:new()).
+% app_keys() ->
+%   dict:store(<<"key1">>, {<<"app1">>, <<"secret1">>, <<"appname">>}, dict:new()).
 
 setup() ->
-  erlypusher_config:set({app_ids(), app_keys()}).
+  ok.
+  % erlypusher_config:set({app_ids(), app_keys()}).
 
 clean() ->
   ok.

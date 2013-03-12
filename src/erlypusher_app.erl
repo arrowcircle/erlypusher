@@ -14,6 +14,8 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+    % Port = application:get_env(erlypusher, port),
+    erlypusher_config:prepare(),
     case init:get_argument(port) of
       {ok, [[Port|_]|_]} ->
         ok;
