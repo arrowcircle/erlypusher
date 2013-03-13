@@ -78,6 +78,10 @@ signature(ParamsHash, Method, Url, Secret) ->
   sign(join_signature_string(Method, Url, SignString), Secret).
 
 timestamp_check(Params) ->
+  {ok, AuthTimeStamp} = dict:find(<<"auth_timestamp">>, dict:from_list(Params)),
+  {First, Second, Third} = os:timestamp(),
+  % {1363,207836,59418}
+  TimeStamp = <<First/binary, Second/binary, Third/binary>>,
   ok.
 
 signature_check(Signature, Params, Method, Url, Secret) ->
