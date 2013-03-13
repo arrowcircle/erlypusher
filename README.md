@@ -41,29 +41,28 @@ Copy sample config:
 And edit config. Add apps and keys for erlypusher:
 
 	{
-    "port": 8080,
-    "apps": [
-      "app_name1": {
-        "app_id": "appid1",
-        "key": "key1",
-        "secret": "secret1"
-      },
+      "port": 8080,
+      "apps": [
+        "app_name1": {
+          "app_id": "appid1",
+          "key": "key1",
+          "secret": "secret1"
+        },
 
-      "app_name2": {
-        "app_id": "appid2",
-        "key": "key2",
-        "secret": "secret2"
-      }
-    ]
-  }
-
+        "app_name2": {
+          "app_id": "appid2",
+          "key": "key2",
+          "secret": "secret2"
+        }
+      ]
+    }
 Add erlang cookie file. Put same file on other machines if You use it in cluster ~/.erlang.cookie
 
 	MYERLYPUSHERCOOKIEMYERLYPUSHERCOOKIE
 
 Add erlang hosts file (even for local usage) ~/.hosts.erlang
 
-For local use:
+For local use (dont forget to add new line after last entry):
 
 	'localhost'.
 
