@@ -25,7 +25,7 @@ Add Erlang Solutions public key:
 And install Erlang:
 
 	sudo apt-get update
-	sudo apt-get install esl-erlang git buld-essential -y -q
+	sudo apt-get install esl-erlang git build-essential -y -q
 
 ### Install erlypusher
 Clone erlypusher repo:
