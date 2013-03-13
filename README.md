@@ -59,7 +59,7 @@ And edit config. Add apps and keys for erlypusher:
 
 Add erlang cookie file. Put same file on other machines if You use it in cluster ~/.erlang.cookie
 
-	MYERLYPUSHERCOOKIE
+	MYERLYPUSHERCOOKIEMYERLYPUSHERCOOKIE
 
 Add erlang hosts file (even for local usage) ~/.hosts.erlang
 
