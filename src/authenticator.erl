@@ -78,10 +78,18 @@ signature(ParamsHash, Method, Url, Secret) ->
   sign(join_signature_string(Method, Url, SignString), Secret).
 
 timestamp_check(Params) ->
-  {ok, AuthTimeStamp} = dict:find(<<"auth_timestamp">>, dict:from_list(Params)),
-  {First, Second, Third} = os:timestamp(),
-  % {1363,207836,59418}
-  TimeStamp = <<First/binary, Second/binary, Third/binary>>,
+  {ok, AuthTimeStampString} = dict:find(<<"auth_timestamp">>, dict:from_list(Params)),
+  TimeStamp = calendar:time_to_seconds(os:timestamp()),
+  % MegaString = AuthTimeStampString[0..3],
+  % SecondsString = AuthTimeStampString[4..9],
+  % MicroString = AuthTimeStampString[10..-1],
+  % Diff = TimeStamp - calendar:time_to_seconds({MegaString, SecondsString, MicroString}).
+  % case Diff of
+  %   > 600 ->
+  %     error;
+  %   < 600 ->
+  %     ok
+  % end.
   ok.
 
 signature_check(Signature, Params, Method, Url, Secret) ->
