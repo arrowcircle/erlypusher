@@ -79,18 +79,22 @@ signature(ParamsHash, Method, Url, Secret) ->
 
 timestamp_check(Params) ->
   {ok, AuthTimeStampString} = dict:find(<<"auth_timestamp">>, dict:from_list(Params)),
-  TimeStamp = calendar:time_to_seconds(os:timestamp()),
-  % MegaString = AuthTimeStampString[0..3],
-  % SecondsString = AuthTimeStampString[4..9],
-  % MicroString = AuthTimeStampString[10..-1],
-  % Diff = TimeStamp - calendar:time_to_seconds({MegaString, SecondsString, MicroString}).
-  % case Diff of
-  %   > 600 ->
-  %     error;
-  %   < 600 ->
-  %     ok
-  % end.
-  ok.
+  {OsMega, OsSeconds, _} = os:timestamp(),
+  AuthTimeStamp = binary_to_list(AuthTimeStampString),
+  Mega = list_to_integer(string:substr(AuthTimeStamp, 1, 4)),
+  Seconds = list_to_integer(string:substr(AuthTimeStamp, 5)),
+  Diff = OsSeconds - Seconds,
+  if
+    Mega == OsMega ->
+      if
+        abs(OsSeconds - Seconds) < 600 ->
+          ok;
+        true ->
+          error
+      end;
+    true ->
+      error
+  end.
 
 signature_check(Signature, Params, Method, Url, Secret) ->
   case signature(Params, Method, Url, Secret) of
