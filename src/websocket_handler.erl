@@ -9,17 +9,40 @@
 init({tcp, http}, _Req, _Opts) ->
   {upgrade, protocol, cowboy_websocket}.
 
-respond_to_action(<<"pusher:subscribe">>, Data, Req) ->
-% {"event":"pusher:subscribe","data":{"channel":"private-MY_CHANNEL","auth":"9ba776377551a1d716b8:329329be89573affd6895f3026a19913f0d2712e95d313830fbb45160dfc3e90"}}
-  {AppKey, _Req2} = cowboy_req:binding(key, Req),
-  case erlypusher_config:app_by_key(AppKey) of
-    error ->
-      ok;
-    {_Key, {AppId, _, _}} ->
+respond_common_channel(Data, Req) ->
+  case check_key(Req) of
+    {error, Key} ->
+      json_responder:response({error_no_app, Key});
+    AppId ->
       ChannelName = request_parser:get_channel_name(Data),
       gproc:reg({p, g, {AppId, ChannelName}}),
       json_responder:response({ok_channel, ChannelName})
-  end;
+  end.
+
+respond_private_channel(Data, Req) ->
+  case check_key(Req) of
+    error ->
+      {AppKey, _Req2} = cowboy_req:binding(key, Req),
+      json_responder:response({error_no_app, AppKey});
+    AppId ->
+      ChannelName = request_parser:get_channel_name(Data),
+      gproc:reg({p, g, {AppId, ChannelName}}),
+      json_responder:response({ok_channel, ChannelName})
+  end.
+
+
+check_key(Req) ->
+  {AppKey, _Req2} = cowboy_req:binding(key, Req),
+  case erlypusher_config:app_by_key(AppKey) of
+    error ->
+      {error, AppKey};
+    {_Key, {AppId, _, _}} ->
+      AppId
+  end.
+
+respond_to_action(<<"pusher:subscribe">>, Data, Req) ->
+% {"event":"pusher:subscribe","data":{"channel":"private-MY_CHANNEL","auth":"9ba776377551a1d716b8:329329be89573affd6895f3026a19913f0d2712e95d313830fbb45160dfc3e90"}}
+  respond_common_channel(Data, Req);
 
 respond_to_action(<<"pusher:unsubscribe">>, Data, Req) ->
   ChannelName = request_parser:get_channel_name(Data),
