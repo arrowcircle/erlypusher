@@ -11,7 +11,12 @@ sign(SignString, Secret) ->
   list_to_binary(string:to_lower(hmac:hexlify(hmac:hmac256(Secret, SignString)))).
 
 can_join(private, ChannelName, SocketId, Auth, CustomString) ->
-  SignString = SocketId ++ ":" ++ binary_to_list(ChannelName) ++ ":" ++ CustomString,
+  case CustomString of
+    CS ->
+      SignString = SocketId ++ ":" ++ binary_to_list(ChannelName) ++ ":" ++ CustomString;
+    _ ->
+      SignString = SocketId ++ ":" ++ binary_to_list(ChannelName)
+  end,
   Secret = "123",
   Auth = sign(SignString, Secret).
 

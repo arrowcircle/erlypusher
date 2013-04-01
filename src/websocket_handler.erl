@@ -16,6 +16,8 @@ respond_common_channel(Data, _Req, AppId) ->
 
 respond_private_channel(Data, Req, AppId) ->
   ChannelName = request_parser:get_channel_name(Data),
+  {ok, {_Key, Secret, _Name}} = erlypusher_config:app_by_id(AppId),
+  {Auth, Req2} = cowboy_req:qs_val(<<"auth">>, Req),
   gproc:reg({p, g, {AppId, ChannelName}}),
   json_responder:response({ok_channel, ChannelName}).
 
