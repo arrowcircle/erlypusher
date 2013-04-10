@@ -10,7 +10,7 @@
 sign(SignString, Secret) ->
   list_to_binary(string:to_lower(hmac:hexlify(hmac:hmac256(Secret, SignString)))).
 
-can_join(ChannelName, SocketId, Auth, CustomString, Secret, Key) ->
+can_join(ChannelName, SocketId, Auth, _CustomString, Secret, Key) ->
   AuthString = binary_to_list(Auth),
   SignString = SocketId ++ ":" ++ binary_to_list(ChannelName),
   CheckAuth = binary_to_list(Key) ++ ":" ++ binary_to_list(sign(SignString, Secret)),
@@ -45,7 +45,7 @@ format_list(Key, Array, <<"">>) ->
 
 format_list(Key, Array, Res) ->
   [H|T] = Array,
-  format_list(Key, T, <<Res/binary, <<"&">>/binary, Key/binary, <<"[]=">>, H/binary>>).
+  format_list(Key, T, <<Res/binary, <<"&">>/binary, Key/binary, <<"[]=">>/binary, H/binary>>).
 
 format_params_list({Key, Value}) ->
   case helper:type_of(Value) of
@@ -89,7 +89,6 @@ timestamp_check(Params) ->
   AuthTimeStamp = binary_to_list(AuthTimeStampString),
   Mega = list_to_integer(string:substr(AuthTimeStamp, 1, 4)),
   Seconds = list_to_integer(string:substr(AuthTimeStamp, 5)),
-  Diff = OsSeconds - Seconds,
   if
     Mega == OsMega ->
       if
