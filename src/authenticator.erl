@@ -1,6 +1,6 @@
 -module(authenticator).
 
--export([sign/2, id/1, md5_check/2, signature_check/5, format_params/1, can_join/5]).
+-export([sign/2, id/1, md5_check/2, signature_check/5, format_params/1, can_join/6]).
 
 -ifdef(TEST).
 -compile(export_all).
@@ -10,11 +10,12 @@
 sign(SignString, Secret) ->
   list_to_binary(string:to_lower(hmac:hexlify(hmac:hmac256(Secret, SignString)))).
 
-can_join(ChannelName, SocketId, Auth, CustomString, Secret) ->
-  SignString = SocketId ++ ":" ++ binary_to_list(ChannelName) ++ ":" ++ CustomString,
-  io:format("auth: ~p, authstring: ~p\n", [sign(SignString, Secret), Auth]),
-  case sign(SignString, Secret) of
-    Auth ->
+can_join(ChannelName, SocketId, Auth, CustomString, Secret, Key) ->
+  AuthString = binary_to_list(Auth),
+  SignString = SocketId ++ ":" ++ binary_to_list(ChannelName),
+  CheckAuth = binary_to_list(Key) ++ ":" ++ binary_to_list(sign(SignString, Secret)),
+  case CheckAuth of
+    AuthString ->
       ok;
     _ ->
       error

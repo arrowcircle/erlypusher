@@ -18,8 +18,8 @@ respond_private_channel(ChannelName, Auth, Req, AppId) ->
   % ChannelName = request_parser:get_channel_name(Data),
   {ok, {_Key, Secret, _Name}} = erlypusher_config:app_by_id(AppId),
   SocketId = gproc:get_value({p, g, socket_id}),
-  {ok, {_Key, Secret, _Name}} = erlypusher_config:app_by_id(AppId),
-  case authenticator:can_join(ChannelName, SocketId, Auth, "", Secret) of
+  {ok, {Key, Secret, _Name}} = erlypusher_config:app_by_id(AppId),
+  case authenticator:can_join(ChannelName, SocketId, Auth, "", Secret, Key) of
     ok ->
       gproc:reg({p, g, {AppId, ChannelName}}),
       json_responder:response({ok_channel, ChannelName});

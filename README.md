@@ -75,9 +75,7 @@ Run erlypusher
 	make run
 
 # To-do
-* Timestamp check for api
 * Channels handler (info, occupied)
-* Private channels subscriptions
 * Refactor all shit
 * Use jiffy for json parse and generation
 * Presence channels subscriptions with lists of presence
