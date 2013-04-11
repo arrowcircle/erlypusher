@@ -38,8 +38,19 @@ channel(Json) ->
   Channel_name.
 
 parse(Req) ->
+  % get body and convert to json
   {ok, Body, Req2} = cowboy_req:body(Req),
-  BodyJson = jiffy:decode(Body),
+  Json = jiffy:decode(Body),
+  % get app_key and return app
   {AppKey, Req3} = cowboy_req:binding(key, Req2),
+  % get event
+  Event = event(Json),
+  % if event is subscription, get channel and channel_type
+  Channel = channel(Json),
+  ChannelType = channel_type(Channel),
+  % if channel type is private or presence - get auth
+  Auth = auth(Json),
+  % if channel type is presence - get channel_data
+  Data = channel_data(Json),
   Dict = ok,
   {Dict, Req}.

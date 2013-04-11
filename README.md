@@ -79,6 +79,8 @@ Run erlypusher
 * Refactor all shit
 * Use jiffy for json parse and generation
 * Presence channels subscriptions with lists of presence
+* Support of sock.js
+* Support of 2.0 pusher
 * Init script for linux systems
 * Chef recipe for erlypusher
 
