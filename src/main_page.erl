@@ -12,10 +12,13 @@ handle(Req, State) ->
     <title>Websocket Test</title>
   </head>
   <body>
-    <script src=\"http://js.pusher.com/1.12/pusher.min.js\"></script>
+    <script src=\"http://js.pusher.com/2.0/pusher.min.js\"></script>
     <script type=\"text/javascript\">
-      Pusher.host    = \"127.0.0.1\"
-      Pusher.ws_port = \"8081\"
+      Pusher.host    = \"127.0.0.1\";
+      Pusher.ws_port = \"8081\";
+      Pusher.stats_host = '127.0.0.1:8081';
+      Pusher.sockjs_host = 'localhost';
+      Pusher.sockjs_http_port = '8081';
       Pusher.log = function(data) {
         console.log('\t\t', data);
       };
