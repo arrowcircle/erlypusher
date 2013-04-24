@@ -2,6 +2,8 @@
 
 % -export([get_event/1]).
 
+-include_lib("erlson/include/erlson.hrl").
+
 -ifdef(TEST).
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
