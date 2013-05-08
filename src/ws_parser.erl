@@ -10,7 +10,7 @@
 -endif.
 
 event(Json) ->
-  {[{<<"event">>, Event}, _]} = Json,
+  Event = Json.event,
   Event.
 
 channel_type(ChannelName) ->
@@ -28,21 +28,21 @@ channel_type(ChannelName) ->
   end.
 
 auth(Json) ->
-  {[_|[{<<"data">>, {[_|[{<<"auth">>, Auth}|_]]}}|_]]} = Json,
+  Auth = Json.data.auth,
   Auth.
 
 channel_data(Json) ->
-  {[_|[{<<"data">>, {[_|[_|[{<<"channel_data">>, Data}|_]]]}}|_]]} = Json,
+  Data = Json.data.channel_data,
   Data.
 
 channel(Json) ->
-  {[_|[{<<"data">>, {[{<<"channel">>, Channel_name}|_]}}|_]]} = Json,
+  Channel_name = Json.data.channel,
   Channel_name.
 
 parse(Req) ->
   % get body and convert to json
   {ok, Body, Req2} = cowboy_req:body(Req),
-  Json = jiffy:decode(Body),
+  Json = erlson:from_json(Body),
   % get app_key and return app
   {AppKey, Req3} = cowboy_req:binding(key, Req2),
   % get event

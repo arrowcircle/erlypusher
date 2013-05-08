@@ -2,6 +2,7 @@
 
 -module(erlypusher).
 
+-include_lib("erlson/include/erlson.hrl").
 %% API.
 -export([start/0]).
 
@@ -13,4 +14,5 @@ start() ->
     application:start(ranch),
     application:start(cowboy),
     application:start(gproc),
+    erlson:init(),
     application:start(erlypusher).
