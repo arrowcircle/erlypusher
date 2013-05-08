@@ -14,5 +14,4 @@ start() ->
     application:start(ranch),
     application:start(cowboy),
     application:start(gproc),
-    erlson:init(),
     application:start(erlypusher).

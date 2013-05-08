@@ -21,12 +21,3 @@ generate_request_parser_test_() ->
      ?_assertEqual(<<"AUTHKEY">>, ws_parser:auth(?AUTH_JSON)),
      ?_assertEqual(<<"CHANNELOBJECT">>, ws_parser:channel_data(?DATA_JSON))]
    }.
-
-% generate_request_parser_test_() ->
-%   [?_assertEqual(<<"pusher:subscribe">>, ws_parser:event(?COMMON_CHANNEL_JSON)),
-%    ?_assertEqual(<<"MY_CHANNEL">>, ws_parser:channel(?COMMON_CHANNEL_JSON)),
-%    ?_assertEqual(common, ws_parser:channel_type(?COMMON_CHANNEL)),
-%    ?_assertEqual(private, ws_parser:channel_type(?PRIVATE_CHANNEL)),
-%    ?_assertEqual(presence, ws_parser:channel_type(?PRESENCE_CHANNEL)),
-%    ?_assertEqual(<<"AUTHKEY">>, ws_parser:auth(?AUTH_JSON)),
-%    ?_assertEqual(<<"CHANNELOBJECT">>, ws_parser:channel_data(?DATA_JSON))].
