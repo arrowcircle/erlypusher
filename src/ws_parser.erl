@@ -44,7 +44,12 @@ parse(Req) ->
   FirstDict = dict:new(),
   Json = erlson:from_json(Body),
   {AppKey, Req3} = cowboy_req:binding(key, Req2),
-  {ok, {Id, Secret, Name}} = erlypusher_config:app_by_key(AppKey),
+  case erlypusher_config:app_by_key(AppKey) of
+    {ok, {Id, Secret, Name}} ->
+      App = {Id, AppKey, Secret, Name};
+    _ ->
+      App = {no_key, AppKey}
+  end,
   Event = event(Json),
   Channel = channel(Json),
   ChannelType = channel_type(Channel),
@@ -55,5 +60,5 @@ parse(Req) ->
   TypeDict = dict:append("channel_type", ChannelType, ChannelDict),
   AuthDict = dict:append("auth", Auth, TypeDict),
   DataDict = dict:append("data", Data, AuthDict),
-  AppDict = dict:append("app", {Id, AppKey, Secret, Name}, DataDict),
+  AppDict = dict:append("app", App, DataDict),
   {AppDict, Req}.

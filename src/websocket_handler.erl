@@ -87,12 +87,9 @@ respond_to_request(Data, Req) ->
   end.
 
 websocket_init(_Any, Req, _Opt) ->
-  % check if app_id and key exist
   SocketId = uuid:to_string(uuid:v4()),
   Pid = request_parser:get_pid_from_req(Req),
   gproc:reg({p, g, socket_id}, SocketId),
-  % get value by this
-  % gproc:get_value({p, g, socket_id}, erlang:list_to_pid("<0.286.0>")).
 
   case check_key(Req) of
     {error, Key} ->
