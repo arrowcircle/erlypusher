@@ -1,6 +1,6 @@
 -module(authenticator).
 
--export([sign/2, id/1, md5_check/2, signature_check/5, format_params/1, can_join/6]).
+-export([can_join/6, sign/2, id/1, md5_check/2, signature_check/5, format_params/1]).
 
 -ifdef(TEST).
 -compile(export_all).

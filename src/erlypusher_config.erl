@@ -17,8 +17,12 @@ app_by_id(Id) ->
   end.
 
 app_by_key(Key) ->
-  {ok, Dict} = application:get_env(erlypusher, app_keys),
-  dict:find(Key, Dict).
+  case application:get_env(erlypusher, app_keys) of
+  {ok, Dict} ->
+    dict:find(Key, Dict);
+  _ ->
+    {error, app_not_found}
+  end.
 
 set({AppIds, AppKeys}, Port) ->
   application:set_env(erlypusher, app_ids, AppIds),

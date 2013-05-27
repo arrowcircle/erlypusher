@@ -43,19 +43,14 @@ check_channel_type(ChannelName) ->
   end.
 
 respond_to_action({<<"pusher:subscribe">>, AppId}, Data, Req) ->
-% {"event":"pusher:subscribe","data":{"channel":"private-MY_CHANNEL","auth":"9ba776377551a1d716b8:329329be89573affd6895f3026a19913f0d2712e95d313830fbb45160dfc3e90"}}
   ChannelName = request_parser:get_channel_name(Data),
   case check_channel_type(ChannelName) of
     private ->
-      % io:format("Received common connection\n"),
       Auth = request_parser:get_auth(Data),
       respond_private_channel(ChannelName, Auth, Req, AppId);
     presence ->
-      % io:format("Received presence connection\n"),
-      % presence channel
       ok;
     common ->
-      % io:format("Received common connection\n"),
       respond_common_channel(ChannelName, Req, AppId)
   end;
 
@@ -101,8 +96,10 @@ websocket_init(_Any, Req, _Opt) ->
   {ok, Req, undefined_state}.
 
 websocket_handle({text, Data}, Req, State) ->
-  Resp = respond_to_request(Data, Req),
-  {reply, {text, Resp}, Req, State, hibernate};
+  {Dict, Req2} = ws_parser:parse(Req, Data),
+  Val = client_validator:check(Dict),
+  Resp = respond_to_request(Data, Req2),
+  {reply, {text, Resp}, Req2, State, hibernate};
 
 websocket_handle(_Any, Req, State) ->
   {ok, Req, State, hibernate}.
