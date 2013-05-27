@@ -77,7 +77,6 @@ Run erlypusher
 # To-do
 * Channels handler (info, occupied)
 * Refactor all shit
-* Use jiffy for json parse and generation
 * Presence channels subscriptions with lists of presence
 * Support of sock.js
 * Support of 2.0 pusher
