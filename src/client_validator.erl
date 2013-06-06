@@ -14,8 +14,8 @@ check(Dict) ->
       event(Dict);
     [{_Id, _AppKey, _Secret, _Name}] ->
       event(Dict);
-    {no_key, _AppKey} ->
-      {error, no_app_by_key};
+    {no_key, AppKey} ->
+      {error, no_app_by_key, AppKey};
     _Err ->
       {error, dict_app_error}
   end.

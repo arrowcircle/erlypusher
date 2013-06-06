@@ -28,8 +28,12 @@ channel_type(ChannelName) ->
   end.
 
 auth(Json) ->
-  Auth = Json.data.auth,
-  Auth.
+  case catch Json.data.auth of
+    Auth ->
+      Auth;
+    _ ->
+      error
+  end.
 
 channel_data(Json) ->
   case catch Json.data.channel_data of
@@ -53,6 +57,7 @@ parse(Req, Data) ->
     _ ->
       App = {no_key, AppKey}
   end,
+  Pid = element(5, Req),
   Event = event(Json),
   Channel = channel(Json),
   ChannelType = channel_type(Channel),
@@ -61,11 +66,12 @@ parse(Req, Data) ->
   TypeDict = dict:append("channel_type", ChannelType, ChannelDict),
   case auth(Json) of
     Auth -> AuthDict = dict:append("auth", Auth, TypeDict);
-    _ -> AuthDict = TypeDict
+    error -> AuthDict = TypeDict
   end,
-  case channel_data(Json) of
+  case catch channel_data(Json) of
     Data -> DataDict = dict:append("data", Data, AuthDict);
     _ -> DataDict = AuthDict
   end,
   AppDict = dict:append("app", App, DataDict),
-  {AppDict, Req2}.
+  PidDict = dict:append("pid", Pid, AppDict),
+  {PidDict, Req2}.

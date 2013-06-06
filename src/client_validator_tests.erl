@@ -13,7 +13,7 @@
 -define(WRONG_PRIVATE_CHANNEL, dict:from_list([{"event", <<"pusher:subscribe">>}, {"app", {"id", "key", "secret", "name"}}, {"channel", <<"private-channel">>}, {"channel_type", private}])).
 
 client_validator_test_() ->
-  [?_assertEqual({error, no_app_by_key}, client_validator:check(?NO_APP)),
+  [?_assertEqual({error, no_app_by_key, "123"}, client_validator:check(?NO_APP)),
    ?_assertEqual(ok, client_validator:check(?COMMON_CHANNEL)),
    ?_assertEqual(ok, client_validator:event(?PING)),
    ?_assertEqual(ok, client_validator:event(?UNSUBSCRIBE)),
