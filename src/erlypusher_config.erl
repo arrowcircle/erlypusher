@@ -2,10 +2,7 @@
 
 -export([prepare/0, app_by_id/1, app_by_key/1, readlines/1]).
 
--ifdef(TEST).
--compile(export_all).
--include_lib("eunit/include/eunit.hrl").
--endif.
+-include_lib("erlson/include/erlson.hrl").
 
 app_by_id(Id) ->
   Env = application:get_env(erlypusher, app_ids),
@@ -52,57 +49,21 @@ lookup() ->
       readlines(Path)
   end.
 
-extract_port(Json) ->
-  case Json of
-    {[{<<"port">>, Port}|_]} ->
-      Port;
-    [{<<"port">>, Port}|_] ->
-      Port
-  end.
-
 extract_apps(Json) ->
-  case Json of
-    {[_|[{<<"apps">>, AppsJson}|_]]} ->
-      AppsJson;
-    [_|[{<<"apps">>, AppsJson}|_]] ->
-      AppsJson
-  end.
+  Apps = Json.apps,
+  Apps.
 
 load(File) ->
-  case jiffy:decode(File) of
-    {Json} ->
-      Json;
-    {error, Error} ->
-      {error, Error}
-  end.
+  erlson:from_json(File).
 
 parse(Json) ->
-  Port = extract_port(Json),
+  Port = Json.port,
   {parse_apps_array(extract_apps(Json), dict:new(), dict:new()), Port}.
-
-parse_info(El) ->
-  case helper:type_of(El) of
-    list ->
-      [{AppName, InfoHash}|_] = El;
-    tuple ->
-      case El of
-        {[{AppName, InfoHash}]} ->
-          ok;
-        {AppName, InfoHash} ->
-          ok
-      end
-  end,
-  {[{<<"app_id">>, AppId}|KeySecretArr]} = InfoHash,
-  [{<<"key">>, Key}|SecretArr] = KeySecretArr,
-  [{<<"secret">>, Secret}]= SecretArr,
-  {AppId, Key, Secret, AppName}.
 
 parse_apps_array(AppsArray, AppIds, AppKeys) ->
   case AppsArray of
     [] ->
       {AppIds, AppKeys};
     [Elem | NewAppsArray] ->
-      % [Elem | NewAppsArray] = AppsArray,
-      {AppId, Key, Secret, AppName} = parse_info(Elem),
-      parse_apps_array(NewAppsArray, dict:store(AppId, {Key, Secret, AppName}, AppIds), dict:store(Key, {AppId, Secret, AppName}, AppKeys))
+      parse_apps_array(NewAppsArray, dict:store(Elem.app_id, {Elem.key, Elem.secret, Elem.name}, AppIds), dict:store(Elem.key, {Elem.app_id, Elem.secret, Elem.name}, AppKeys))
   end.

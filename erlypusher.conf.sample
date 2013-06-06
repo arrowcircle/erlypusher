@@ -1,16 +1,17 @@
 {
-  "port": 8080,
+  "port": 8081,
   "apps": [
-    {"app_name1": {
+    {
       "app_id": "appid1",
       "key": "key1",
-      "secret": "secret1"
-    }},
-
-    {"app_name2": {
+      "secret": "secret1",
+      "name": "app_name1"
+    },
+    {
       "app_id": "appid2",
       "key": "key2",
-      "secret": "secret2"
-    }}
+      "secret": "secret2",
+      "name": "app_name2"
+    }
   ]
 }
