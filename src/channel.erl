@@ -1,5 +1,5 @@
 -module(channel).
--export([handle/1]).
+-export([handle/1, init_connection/1]).
 
 -ifdef(TEST).
 -compile(export_all).
@@ -13,6 +13,27 @@ api(event, {Name, Data, ChannelName}) ->
                  {<<"channel">>, ChannelName}]}).
 
 % client
+
+check_key(Req) ->
+  {AppKey, _Req2} = cowboy_req:binding(key, Req),
+  case erlypusher_config:app_by_key(AppKey) of
+    error ->
+      {error, AppKey};
+    {_Key, {AppId, _, _}} ->
+      AppId
+  end.
+
+init_connection(Req) ->
+  SocketId = uuid:to_string(uuid:v4()),
+  Pid = request_parser:get_pid_from_req(Req),
+  case check_key(Req) of
+    {error, Key} ->
+      Pid ! json_responder:response({error_no_app, Key});
+    _AppId ->
+      gproc:reg({p, g, socket_id}, SocketId),
+      Pid ! json_responder:response({ok_connection, SocketId})
+  end,
+  Req.
 
 handle(Dict) ->
   {ok, [Event]} = dict:find("event", Dict),
