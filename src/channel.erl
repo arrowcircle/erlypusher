@@ -18,7 +18,7 @@ handle(Dict) ->
   {ok, [Event]} = dict:find("event", Dict),
   handle(Event, Dict).
 
-handle(<<"pusher:ping">>, Dict) ->
+handle(<<"pusher:ping">>, _Dict) ->
   ping();
 
 handle(<<"pusher:unsubscribe">>, Dict) ->
@@ -32,7 +32,6 @@ handle(<<"pusher:subscribe">>, Dict) ->
 
 unsubscribe(Dict) ->
   {ok, [ChannelName]} = dict:find("channel", Dict),
-  {ok, [Pid]} = dict:find("pid", Dict),
   {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
   gproc:unreg({p, g, {AppId, ChannelName}}),
   success(ChannelName).
