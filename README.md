@@ -43,16 +43,18 @@ And edit config. Add apps and keys for erlypusher:
 	{
       "port": 8080,
       "apps": [
-        "app_name1": {
+        {
           "app_id": "appid1",
           "key": "key1",
-          "secret": "secret1"
+          "secret": "secret1",
+          "name": "app_name1"
         },
 
-        "app_name2": {
+        {
           "app_id": "appid2",
           "key": "key2",
-          "secret": "secret2"
+          "secret": "secret2",
+          "name": "app_name2"
         }
       ]
     }
