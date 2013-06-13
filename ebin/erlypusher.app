@@ -9,7 +9,7 @@
                         authenticator_tests,channel,channels_handler,
                         client_validator,client_validator_tests,erlsha2,
                         erlypusher,erlypusher_app,erlypusher_config,
-                        erlypusher_config_tests,erlypusher_sup,helper,hmac,
-                        json_responder,json_responder_tests,main_page,
-                        middleware,request_parser,request_parser_tests,uuid,
+                        erlypusher_sup,helper,hmac,json_responder,
+                        json_responder_tests,main_page,middleware,
+                        request_parser,request_parser_tests,uuid,
                         websocket_handler,ws_parser,ws_parser_tests]}]}.
