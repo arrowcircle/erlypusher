@@ -11,5 +11,5 @@
                         erlypusher,erlypusher_app,erlypusher_config,
                         erlypusher_sup,helper,hmac,json_responder,
                         json_responder_tests,main_page,middleware,
-                        request_parser,request_parser_tests,uuid,
-                        websocket_handler,ws_parser,ws_parser_tests]}]}.
+                        request_parser,request_parser_tests,timeline_handler,
+                        uuid,websocket_handler,ws_parser,ws_parser_tests]}]}.

@@ -59,11 +59,17 @@ parse(Req, Data) ->
   end,
   Pid = element(5, Req),
   Event = event(Json),
-  Channel = channel(Json),
-  ChannelType = channel_type(Channel),
-  EventDict = dict:append("event", Event, FirstDict),
-  ChannelDict = dict:append("channel", Channel, EventDict),
-  TypeDict = dict:append("channel_type", ChannelType, ChannelDict),
+  case Event of
+    <<"pusher:ping">> ->
+      EventDict = dict:append("event", Event, FirstDict),
+      TypeDict = EventDict;
+    _ ->
+      Channel = channel(Json),
+      ChannelType = channel_type(Channel),
+      EventDict = dict:append("event", Event, FirstDict),
+      ChannelDict = dict:append("channel", Channel, EventDict),
+      TypeDict = dict:append("channel_type", ChannelType, ChannelDict)
+  end,
   case auth(Json) of
     Auth -> AuthDict = dict:append("auth", Auth, TypeDict);
     error -> AuthDict = TypeDict

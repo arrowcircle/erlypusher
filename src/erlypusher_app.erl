@@ -28,7 +28,8 @@ start(_StartType, _StartArgs) ->
                            {"/apps/:app_id/channels/:channel_id/events", api_handler, []},
                            {"/apps/:app_id/events", api_handler, []},
                            {"/apps/:app_id/channels", channels_handler, []},
-                           {"/apps/:app_id/channels/:channel_id", channels_handler, []}
+                           {"/apps/:app_id/channels/:channel_id", channels_handler, []},
+                           {"/timeline/:id", timeline_handler, []}
                           ]}
                 ]),
     cowboy:start_http(my_http_listener, 100,
