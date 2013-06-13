@@ -27,7 +27,7 @@ And install Erlang:
 	sudo apt-get update
 	sudo apt-get install esl-erlang git build-essential -y -q
 
-### Install erlypusher
+## Install erlypusher
 Clone erlypusher repo:
 
 	cd /opt
@@ -75,6 +75,50 @@ Run erlypusher
 	cd /opt/erlypusher
 	make full
 	make run
+	
+# Usage
+## Ruby
+To use with ruby gem, add this code to your initializer:
+
+	Pusher.host = 'localhost'
+	Pusher.port = 8081
+	Pusher.app_id = 'appid1'
+	Pusher.key = 'key1'
+	Pusher.secret = 'secret1'
+	
+## JavaScrpit
+To use with javascript client, add `host` and `ws_port` params to your code:
+
+	<script src="http://js.pusher.com/2.0/pusher.min.js"></script>
+	<script type="text/javascript">
+	  Pusher.log = function(data) {
+	    console.log('\t\t', data);
+	  };
+	  Pusher.host    = "127.0.0.1";
+	  Pusher.ws_port = "8081";
+	  var pusher = new Pusher('key1');
+ 	  pusher.bind('pusher:error', function(data) { console.log(data.to_json) })
+	  var myChannel = pusher.subscribe('MY_CHANNEL');
+	  myChannel.bind('an_event', function(data) { console.log(data) })
+	</script>
+	
+If you want to use Pusher 2.0 js library you need to set `stats_host`, `sockjs_host` and `sockjs_port`:
+
+	<script src="http://js.pusher.com/2.0/pusher.min.js"></script>
+	 <script type="text/javascript">
+	  Pusher.log = function(data) {
+	    console.log('\t\t', data);
+	  };
+	  Pusher.host    = "127.0.0.1";
+	  Pusher.ws_port = "8081";
+	  Pusher.stats_host = '127.0.0.1:8081';
+      Pusher.sockjs_host = 'localhost';
+      Pusher.sockjs_http_port = '8081';
+	  var pusher = new Pusher('key1');
+ 	  pusher.bind('pusher:error', function(data) { console.log(data.to_json) })
+	  var myChannel = pusher.subscribe('MY_CHANNEL');
+	  myChannel.bind('an_event', function(data) { console.log(data) })
+	</script>
 
 # To-do
 * Channels handler (info, occupied)
