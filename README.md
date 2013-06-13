@@ -75,7 +75,7 @@ Run erlypusher
 	cd /opt/erlypusher
 	make full
 	make run
-	
+
 # Usage
 ## Ruby
 To use with ruby gem, add this code to your initializer:
@@ -85,7 +85,7 @@ To use with ruby gem, add this code to your initializer:
 	Pusher.app_id = 'appid1'
 	Pusher.key = 'key1'
 	Pusher.secret = 'secret1'
-	
+
 ## JavaScrpit
 To use with javascript client, add `host` and `ws_port` params to your code:
 
@@ -101,7 +101,7 @@ To use with javascript client, add `host` and `ws_port` params to your code:
 	  var myChannel = pusher.subscribe('MY_CHANNEL');
 	  myChannel.bind('an_event', function(data) { console.log(data) })
 	</script>
-	
+
 If you want to use Pusher 2.0 js library you need to set `stats_host`, `sockjs_host` and `sockjs_port`:
 
 	<script src="http://js.pusher.com/2.0/pusher.min.js"></script>
@@ -125,7 +125,6 @@ If you want to use Pusher 2.0 js library you need to set `stats_host`, `sockjs_h
 * Refactor all shit
 * Presence channels subscriptions with lists of presence
 * Support of sock.js
-* Support of 2.0 pusher
 * Init script for linux systems
 * Chef recipe for erlypusher
 
