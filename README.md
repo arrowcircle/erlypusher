@@ -121,11 +121,14 @@ If you want to use Pusher 2.0 js library you need to set `stats_host`, `sockjs_h
 	</script>
 
 # To-do
-* Channels handler (info, occupied)
-* Refactor all shit
-* Presence channels subscriptions with lists of presence
-* Support of sock.js
+* Remove old json parser from all parts and use erlson
 * Init script for linux systems
 * Chef recipe for erlypusher
+* MOAR TESTS!
+* Refactor all shit
+* Channels handler (info, occupied)
+* Presence channels subscriptions with lists of presence
+* Support of sock.js
+
 
 
