@@ -1,4 +1,4 @@
--module(authenticator_tests).
+-module(erlypusher_authenticator_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -22,11 +22,11 @@
 -define(JOINED_PARAMS, <<"auth_key=key1&auth_timestamp=1362567231&auth_version=1.0&body_md5=237ac07e2c8f0b6ec7b07fc9ce422d91&channels[]=MY_CHANNEL&data={\"some\":\"Data\"}&name=event1">>).
 
 generate_authenticator_test_() ->
-  [?_assertEqual(?SIGN_AUTH, authenticator:sign(?SIGN_STRING, ?SECRET))].
+  [?_assertEqual(?SIGN_AUTH, erlypusher_authenticator:sign(?SIGN_STRING, ?SECRET))].
 
 generate_signature_test_() ->
-  [?_assertEqual(?AUTH_SIGNATURE, authenticator:sign(?SIGNATURE_SIGN_STRING, ?SECRET_PARAMS)),
-   ?_assertEqual(?SIGNATURE_SIGN_STRING, authenticator:join_signature_string(<<"POST">>, <<"/apps/appid1/events">>, <<"auth_key=key1&auth_timestamp=1362567231&auth_version=1.0&body_md5=237ac07e2c8f0b6ec7b07fc9ce422d91&channels[]=MY_CHANNEL&data={\"some\":\"Data\"}&name=event1">>))].
+  [?_assertEqual(?AUTH_SIGNATURE, erlypusher_authenticator:sign(?SIGNATURE_SIGN_STRING, ?SECRET_PARAMS)),
+   ?_assertEqual(?SIGNATURE_SIGN_STRING, erlypusher_authenticator:join_signature_string(<<"POST">>, <<"/apps/appid1/events">>, <<"auth_key=key1&auth_timestamp=1362567231&auth_version=1.0&body_md5=237ac07e2c8f0b6ec7b07fc9ce422d91&channels[]=MY_CHANNEL&data={\"some\":\"Data\"}&name=event1">>))].
 
 generate_join_params_test_() ->
-  [?_assertEqual(?JOINED_PARAMS, authenticator:format_params(?UNJOINED_PARAMS))].
+  [?_assertEqual(?JOINED_PARAMS, erlypusher_authenticator:format_params(?UNJOINED_PARAMS))].

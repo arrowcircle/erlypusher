@@ -1,4 +1,4 @@
--module(api_handler_tests).
+-module(erlypusher_api_handler_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 

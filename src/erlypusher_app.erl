@@ -23,13 +23,13 @@ start(_StartType, _StartArgs) ->
     end,
     Dispatch = cowboy_router:compile([
                     %% {HostMatch, list({PathMatch, Handler, Opts})}
-                    {'_', [{"/app/:key", websocket_handler, []},
+                    {'_', [{"/app/:key", erlypusher_websocket_handler, []},
                            {"/", main_page, []},
-                           {"/apps/:app_id/channels/:channel_id/events", api_handler, []},
-                           {"/apps/:app_id/events", api_handler, []},
-                           {"/apps/:app_id/channels", channels_handler, []},
-                           {"/apps/:app_id/channels/:channel_id", channels_handler, []},
-                           {"/timeline/:id", timeline_handler, []}
+                           {"/apps/:app_id/channels/:channel_id/events", erlypusher_api_handler, []},
+                           {"/apps/:app_id/events", erlypusher_api_handler, []},
+                           {"/apps/:app_id/channels", erlypusher_channels_handler, []},
+                           {"/apps/:app_id/channels/:channel_id", erlypusher_channels_handler, []},
+                           {"/timeline/:id", erlypusher_timeline_handler, []}
                           ]}
                 ]),
     cowboy:start_http(my_http_listener, 100,

@@ -1,4 +1,4 @@
--module(authenticator).
+-module(erlypusher_authenticator).
 
 -export([can_join/6, sign/2, id/1, md5_check/2, signature_check/5, format_params/1]).
 
@@ -48,7 +48,7 @@ format_list(Key, Array, Res) ->
   format_list(Key, T, <<Res/binary, <<"&">>/binary, Key/binary, <<"[]=">>/binary, H/binary>>).
 
 format_params_list({Key, Value}) ->
-  case helper:type_of(Value) of
+  case erlypusher_helper:type_of(Value) of
     list ->
       format_list(Key, Value);
     bitstring ->
@@ -80,7 +80,7 @@ signature(ParamsHash, Method, Url, Secret) ->
   Params = dict:from_list(ParamsHash),
   ParamsNew = dict:to_list(dict:erase(<<"auth_signature">>, Params)),
   ParamsForAuth = lists:sort(fun({A, _}, {B, _}) -> A < B end, ParamsNew),
-  SignString = authenticator:format_params(ParamsForAuth),
+  SignString = erlypusher_authenticator:format_params(ParamsForAuth),
   sign(join_signature_string(Method, Url, SignString), Secret).
 
 timestamp_check(Params) ->

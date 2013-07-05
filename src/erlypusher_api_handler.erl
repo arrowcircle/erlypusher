@@ -1,4 +1,4 @@
--module(api_handler).
+-module(erlypusher_api_handler).
 -export([init/3, handle/2, terminate/3]).
 
 -ifdef(TEST).
@@ -11,7 +11,7 @@ init({_Any, http}, Req, []) ->
 
 % handle helpers
 send_to_channel(Name, Data, ChannelName, Id) ->
-  Message = json_responder:response(event, {Name, Data, ChannelName}),
+  Message = erlypusher_json_responder:response(event, {Name, Data, ChannelName}),
   gproc:send({p, g, {Id, ChannelName}}, Message).
 
 send_to_channels(_Name, _Data, _Id, []) ->
@@ -62,7 +62,7 @@ check_signature(Req, State, AuthSignature, Body, Secret, Id) ->
   {ParamsHash, Req2} = cowboy_req:qs_vals(Req),
   {Method, Req3} = cowboy_req:method(Req2),
   {Url, Req4} = cowboy_req:path(Req3),
-  case authenticator:signature_check(AuthSignature, ParamsHash, Method, Url, Secret) of
+  case erlypusher_authenticator:signature_check(AuthSignature, ParamsHash, Method, Url, Secret) of
     ok ->
       check_body(Req4, State, Id, Body);
     error ->
@@ -72,7 +72,7 @@ check_signature(Req, State, AuthSignature, Body, Secret, Id) ->
   end.
 
 check_md5(BodyMD5, Body) ->
-  case authenticator:md5_check(Body, BodyMD5) of
+  case erlypusher_authenticator:md5_check(Body, BodyMD5) of
     ok ->
       ok;
     error ->

@@ -1,4 +1,4 @@
--module(ws_parser_tests).
+-module(erlypusher_ws_parser_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("erlson/include/erlson.hrl").
@@ -47,13 +47,13 @@ auth({Dict, Req}) ->
 generate_request_parser_test_() ->
    {setup,
     fun () -> erlson:init() end,
-    [?_assertEqual(<<"pusher:subscribe">>, ws_parser:event(?COMMON_CHANNEL_JSON)),
-     ?_assertEqual(<<"MY_CHANNEL">>, ws_parser:channel(?COMMON_CHANNEL_JSON)),
-     ?_assertEqual(common, ws_parser:channel_type(?COMMON_CHANNEL)),
-     ?_assertEqual(private, ws_parser:channel_type(?PRIVATE_CHANNEL)),
-     ?_assertEqual(presence, ws_parser:channel_type(?PRESENCE_CHANNEL)),
-     ?_assertEqual(<<"AUTHKEY">>, ws_parser:auth(?AUTH_JSON)),
-     ?_assertEqual(<<"CHANNELOBJECT">>, ws_parser:channel_data(?DATA_JSON))
+    [?_assertEqual(<<"pusher:subscribe">>, erlypusher_ws_parser:event(?COMMON_CHANNEL_JSON)),
+     ?_assertEqual(<<"MY_CHANNEL">>, erlypusher_ws_parser:channel(?COMMON_CHANNEL_JSON)),
+     ?_assertEqual(common, erlypusher_ws_parser:channel_type(?COMMON_CHANNEL)),
+     ?_assertEqual(private, erlypusher_ws_parser:channel_type(?PRIVATE_CHANNEL)),
+     ?_assertEqual(presence, erlypusher_ws_parser:channel_type(?PRESENCE_CHANNEL)),
+     ?_assertEqual(<<"AUTHKEY">>, erlypusher_ws_parser:auth(?AUTH_JSON)),
+     ?_assertEqual(<<"CHANNELOBJECT">>, erlypusher_ws_parser:channel_data(?DATA_JSON))
      % ?_assertEqual([<<"key1:45823142681eab5288403e4168f7781e6e177e33f2656c17b2b92216af12b886">>], ?AUTH)
      ]
    }.

@@ -1,4 +1,4 @@
--module(client_validator).
+-module(erlypusher_client_validator).
 
 -export([check/1]).
 
@@ -52,7 +52,7 @@ private(Dict) ->
   {ok, ChannelName} = dict:find("channel", Dict),
   {ok, Auth} = dict:find("auth", Dict),
   SocketId = gproc:get_value({p, g, socket_id}),
-  case authenticator:can_join(ChannelName, SocketId, Auth, "", Secret, Key) of
+  case erlypusher_authenticator:can_join(ChannelName, SocketId, Auth, "", Secret, Key) of
     ok ->
       ok;
     _ ->
@@ -60,11 +60,11 @@ private(Dict) ->
   end.
 
 % respond_private_channel(ChannelName, Auth, Req, AppId) ->
-%   % ChannelName = request_parser:get_channel_name(Data),
+%   % ChannelName = erlypusher_request_parser:get_channel_name(Data),
 %   {ok, {_Key, Secret, _Name}} = erlypusher_config:app_by_id(AppId),
 %   SocketId = gproc:get_value({p, g, socket_id}),
 %   {ok, {Key, Secret, _Name}} = erlypusher_config:app_by_id(AppId),
-%   case authenticator:can_join(ChannelName, SocketId, Auth, "", Secret, Key) of
+%   case erlypusher)authenticator:can_join(ChannelName, SocketId, Auth, "", Secret, Key) of
 %     ok ->
 %       gproc:reg({p, g, {AppId, ChannelName}}),
 %       json_responder:response({ok_channel, ChannelName});

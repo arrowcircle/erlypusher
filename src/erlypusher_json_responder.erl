@@ -1,4 +1,4 @@
--module(json_responder).
+-module(erlypusher_json_responder).
 
 -export([response/0, response/1, response/2]).
 

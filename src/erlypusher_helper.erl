@@ -1,4 +1,4 @@
--module(helper).
+-module(erlypusher_helper).
 -export([type_of/1, format_utc_timestamp/0]).
 
 type_of(X) when is_integer(X)   -> integer;

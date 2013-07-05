@@ -1,4 +1,4 @@
--module(client_validator_tests).
+-module(erlypusher_client_validator_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -13,10 +13,10 @@
 -define(WRONG_PRIVATE_CHANNEL, dict:from_list([{"event", <<"pusher:subscribe">>}, {"app", {"id", "key", "secret", "name"}}, {"channel", <<"private-channel">>}, {"channel_type", private}])).
 
 client_validator_test_() ->
-  [?_assertEqual({error, no_app_by_key, "123"}, client_validator:check(?NO_APP)),
-   ?_assertEqual(ok, client_validator:check(?COMMON_CHANNEL)),
-   ?_assertEqual(ok, client_validator:event(?PING)),
-   ?_assertEqual(ok, client_validator:event(?UNSUBSCRIBE)),
-   ?_assertEqual(ok, client_validator:event(?COMMON_CHANNEL)),
-   ?_assertEqual(ok, client_validator:channel(?COMMON_CHANNEL))
+  [?_assertEqual({error, no_app_by_key, "123"}, erlypusher_client_validator:check(?NO_APP)),
+   ?_assertEqual(ok, erlypusher_client_validator:check(?COMMON_CHANNEL)),
+   ?_assertEqual(ok, erlypusher_client_validator:event(?PING)),
+   ?_assertEqual(ok, erlypusher_client_validator:event(?UNSUBSCRIBE)),
+   ?_assertEqual(ok, erlypusher_client_validator:event(?COMMON_CHANNEL)),
+   ?_assertEqual(ok, erlypusher_client_validator:channel(?COMMON_CHANNEL))
    ].

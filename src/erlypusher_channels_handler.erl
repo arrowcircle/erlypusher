@@ -1,4 +1,4 @@
--module(channels_handler).
+-module(erlypusher_channels_handler).
 -export([init/3, handle/2, terminate/3]).
 
 -ifdef(TEST).

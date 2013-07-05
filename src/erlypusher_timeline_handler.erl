@@ -1,4 +1,4 @@
--module(timeline_handler).
+-module(erlypusher_timeline_handler).
 -export([init/3, handle/2, terminate/3]).
 
 init({_Any, http}, Req, []) ->

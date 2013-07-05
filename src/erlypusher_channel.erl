@@ -1,4 +1,4 @@
--module(channel).
+-module(erlypusher_channel).
 -export([handle/1, init_connection/1]).
 
 -ifdef(TEST).
@@ -25,13 +25,13 @@ check_key(Req) ->
 
 init_connection(Req) ->
   SocketId = uuid:to_string(uuid:v4()),
-  Pid = request_parser:get_pid_from_req(Req),
+  Pid = erlypusher_request_parser:get_pid_from_req(Req),
   case check_key(Req) of
     {error, Key} ->
-      Pid ! json_responder:response({error_no_app, Key});
+      Pid ! erlypusher_json_responder:response({error_no_app, Key});
     _AppId ->
       gproc:reg({p, g, socket_id}, SocketId),
-      Pid ! json_responder:response({ok_connection, SocketId})
+      Pid ! erlypusher_json_responder:response({ok_connection, SocketId})
   end,
   Req.
 

@@ -1,4 +1,4 @@
--module(ws_parser).
+-module(erlypusher_ws_parser).
 
  -export([parse/2]).
 
