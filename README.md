@@ -112,8 +112,9 @@ If you want to use Pusher 2.0 js library you need to set `stats_host`, `sockjs_h
 	  Pusher.host    = "127.0.0.1";
 	  Pusher.ws_port = "8081";
 	  Pusher.stats_host = '127.0.0.1:8081';
-      Pusher.sockjs_host = 'localhost';
-      Pusher.sockjs_http_port = '8081';
+    Pusher.sockjs_host = 'localhost';
+    Pusher.sockjs_http_port = '8081';
+    Pusher.disableStats = true;
 	  var pusher = new Pusher('key1');
  	  pusher.bind('pusher:error', function(data) { console.log(data.to_json) })
 	  var myChannel = pusher.subscribe('MY_CHANNEL');

@@ -19,6 +19,7 @@ handle(Req, State) ->
       Pusher.stats_host = '127.0.0.1:8081';
       Pusher.sockjs_host = 'localhost';
       Pusher.sockjs_http_port = '8081';
+      Pusher.disableStats = true;
       Pusher.log = function(data) {
         console.log('\t\t', data);
       };
