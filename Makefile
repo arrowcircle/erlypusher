@@ -18,3 +18,12 @@ run:
 
 run2:
 	./rebar compile && ERL_LIBS=apps:deps erl +K true -sname erlypusher2@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error
+
+start_daemon:
+	./rebar compile && ERL_LIBS=apps:deps run_erl -daemon  ./tmp/ ./log/ "erl +K true -sname erlypusher@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error"
+
+stop_daemon:
+	echo "init:stop()." | to_erl ./tmp/
+
+install:
+	cp erlypusher.init.d /etc/init.d/erlypusher; chmod 755 /etc/init.d/erlypusher; update-rc.d erlypusher defaults
