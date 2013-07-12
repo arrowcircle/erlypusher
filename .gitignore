@@ -12,3 +12,4 @@ gproc_dist_erlypusher@railspro2
 /Gemfile.lock
 /erlypusher.conf
 .rvmrc
+/ebin
