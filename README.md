@@ -122,8 +122,8 @@ If you want to use Pusher 2.0 js library you need to set `stats_host`, `sockjs_h
 	</script>
 
 # To-do
+* Change dict to proplist or orddict
 * Remove old json parser from all parts and use erlson
-* Init script for linux systems
 * Chef recipe for erlypusher
 * MOAR TESTS!
 * Refactor all shit
