@@ -24,7 +24,7 @@ can_join(ChannelName, SocketId, Auth, _CustomString, Secret, Key) ->
 id(Req) ->
   {AppId, Req2} = cowboy_req:binding(app_id, Req),
   {ok, Dict} = application:get_env(erlypusher, app_ids),
-  App = dict:find(AppId, Dict),
+  App = orddict:find(AppId, Dict),
   case App of
     {ok, AppInfo} ->
       {ok, AppInfo, Req2};

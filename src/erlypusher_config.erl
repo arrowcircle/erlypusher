@@ -8,7 +8,7 @@ app_by_id(Id) ->
   Env = application:get_env(erlypusher, app_ids),
   case Env of
     {ok, Dict} ->
-      dict:find(Id, Dict);
+      orddict:find(Id, Dict);
     undefined ->
       error
   end.
@@ -16,7 +16,7 @@ app_by_id(Id) ->
 app_by_key(Key) ->
   case application:get_env(erlypusher, app_keys) of
   {ok, Dict} ->
-    dict:find(Key, Dict);
+    orddict:find(Key, Dict);
   _ ->
     {error, app_not_found}
   end.
@@ -58,12 +58,12 @@ load(File) ->
 
 parse(Json) ->
   Port = Json.port,
-  {parse_apps_array(extract_apps(Json), dict:new(), dict:new()), Port}.
+  {parse_apps_array(extract_apps(Json), orddict:new(), orddict:new()), Port}.
 
 parse_apps_array(AppsArray, AppIds, AppKeys) ->
   case AppsArray of
     [] ->
       {AppIds, AppKeys};
     [Elem | NewAppsArray] ->
-      parse_apps_array(NewAppsArray, dict:store(Elem.app_id, {Elem.key, Elem.secret, Elem.name}, AppIds), dict:store(Elem.key, {Elem.app_id, Elem.secret, Elem.name}, AppKeys))
+      parse_apps_array(NewAppsArray, orddict:store(Elem.app_id, {Elem.key, Elem.secret, Elem.name}, AppIds), orddict:store(Elem.key, {Elem.app_id, Elem.secret, Elem.name}, AppKeys))
   end.
