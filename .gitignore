@@ -13,3 +13,6 @@ gproc_dist_erlypusher@railspro2
 /erlypusher.conf
 .rvmrc
 /ebin
+.sublime-project
+.floo
+FLOOBITS_README.md
