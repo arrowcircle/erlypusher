@@ -12,7 +12,7 @@
 -define(PRIVATE_CHANNEL, dict:from_list([{"event", <<"pusher:subscribe">>}, {"app", {"id", "key", "secret", "name"}}, {"channel", <<"private-channel">>}, {"channel_type", private}, {"auth", <<"AUTH_STRING">>}])).
 -define(WRONG_PRIVATE_CHANNEL, dict:from_list([{"event", <<"pusher:subscribe">>}, {"app", {"id", "key", "secret", "name"}}, {"channel", <<"private-channel">>}, {"channel_type", private}])).
 
-client_validator_test_() ->
+erlypusher_client_validator_test_() ->
   [?_assertEqual({error, no_app_by_key, "123"}, erlypusher_client_validator:check(?NO_APP)),
    ?_assertEqual(ok, erlypusher_client_validator:check(?COMMON_CHANNEL)),
    ?_assertEqual(ok, erlypusher_client_validator:event(?PING)),

@@ -38,22 +38,19 @@
                                       waiting,undefined,<<>>,false,done,[],
                                       <<>>,undefined}).
 -define(DATA, <<"{\"event\":\"pusher:subscribe\",\"data\":{\"channel\":\"private-MY_CHANNEL\",\"auth\":\"key1:45823142681eab5288403e4168f7781e6e177e33f2656c17b2b92216af12b886\"}}">>).
-% -define(AUTH, auth(ws_parser:parse(?REQ, ?DATA))).
 
 auth({Dict, Req}) ->
   {ok, Auth} = dict:find("auth", Dict),
   Auth.
 
-generate_request_parser_test_() ->
-   {setup,
-    fun () -> erlson:init() end,
-    [?_assertEqual(<<"pusher:subscribe">>, erlypusher_ws_parser:event(?COMMON_CHANNEL_JSON)),
-     ?_assertEqual(<<"MY_CHANNEL">>, erlypusher_ws_parser:channel(?COMMON_CHANNEL_JSON)),
-     ?_assertEqual(common, erlypusher_ws_parser:channel_type(?COMMON_CHANNEL)),
-     ?_assertEqual(private, erlypusher_ws_parser:channel_type(?PRIVATE_CHANNEL)),
-     ?_assertEqual(presence, erlypusher_ws_parser:channel_type(?PRESENCE_CHANNEL)),
-     ?_assertEqual(<<"AUTHKEY">>, erlypusher_ws_parser:auth(?AUTH_JSON)),
-     ?_assertEqual(<<"CHANNELOBJECT">>, erlypusher_ws_parser:channel_data(?DATA_JSON))
-     % ?_assertEqual([<<"key1:45823142681eab5288403e4168f7781e6e177e33f2656c17b2b92216af12b886">>], ?AUTH)
-     ]
-   }.
+erlypusher_ws_parser_tests(_I) ->
+  [?_assertEqual(<<"pusher:subscribe">>, erlypusher_ws_parser:event(?COMMON_CHANNEL_JSON)),
+   ?_assertEqual(<<"MY_CHANNEL">>, erlypusher_ws_parser:channel(?COMMON_CHANNEL_JSON)),
+   ?_assertEqual(common, erlypusher_ws_parser:channel_type(?COMMON_CHANNEL)),
+   ?_assertEqual(private, erlypusher_ws_parser:channel_type(?PRIVATE_CHANNEL)),
+   ?_assertEqual(presence, erlypusher_ws_parser:channel_type(?PRESENCE_CHANNEL)),
+   ?_assertEqual(<<"AUTHKEY">>, erlypusher_ws_parser:auth(?AUTH_JSON)),
+   ?_assertEqual(<<"CHANNELOBJECT">>, erlypusher_ws_parser:channel_data(?DATA_JSON))].
+
+generate_erlypusher_ws_parser_test_() ->
+   {setup, fun () -> erlson:init() end, fun erlypusher_ws_parser_tests/1}.
