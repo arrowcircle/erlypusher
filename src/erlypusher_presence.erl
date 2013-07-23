@@ -3,7 +3,7 @@
 -behaviour(gen_server).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([subscribe/5, unsubscribe/3, user_info/3, channel_info/2, start_link/0]).
+-export([subscribe/5, unsubscribe/3, user_info/3, channel_info/2, start_link/0, stop/0]).
 
 -include_lib("stdlib/include/qlc.hrl").
 
@@ -28,10 +28,6 @@ start_link() ->
 
 stop() ->
   gen_server:call({global, ?MODULE}, stop).
-
-state() ->
-  gen_server:call({global, ?MODULE}, state).
-
 
 %% Server implementation
 

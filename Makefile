@@ -8,7 +8,7 @@ clean:
 	./rebar clean
 
 test:
-	rm -Rf .eunit && ./rebar eunit skip_deps=true
+	rm -Rf .eunit rm -Rf ebin; ./rebar eunit skip_deps=true
 
 dev:
 	./rebar compile && erl -sname erlypusher@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher

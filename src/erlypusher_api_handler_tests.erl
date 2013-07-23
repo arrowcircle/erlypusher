@@ -56,11 +56,11 @@ clean() ->
   ok.
   % meck:unload(erlypusher_config).
 
-api_handler_test_() ->
+erlypusher_api_handler_test_() ->
   [].
 
-generate_api_handler_test_() ->
-  [{setup, fun() -> setup() end, fun(_) -> clean() end, fun api_handler_test_/0}].
+generate_erlypusher_api_handler_test_() ->
+  [{setup, fun() -> setup() end, fun(_) -> clean() end, fun erlypusher_api_handler_test_/0}].
 
 
 % [?_assertEqual(api_handler:handle(?OK_REQUEST, undefined), ?OK_RESPONSE), ?_assertEqual(api_handler:handle(?OK_REQUEST, undefined), ?NOAPP_RESPONSE)].
