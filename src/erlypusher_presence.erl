@@ -3,8 +3,7 @@
 -behaviour(gen_server).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([subscribe/5, start_link/0]).
--compile(export_all).
+-export([subscribe/5, unsubscribe/3, user_info/3, channel_info/2, start_link/0]).
 
 -include_lib("stdlib/include/qlc.hrl").
 
@@ -14,6 +13,15 @@
 
 subscribe(AppId, ChannelId, UserInfo, Pid, Uuid) ->
   gen_server:call({global, ?MODULE}, {subscribe, AppId, ChannelId, UserInfo, Pid, Uuid}).
+
+unsubscribe(AppId, ChannelId, Uuid) ->
+  gen_server:call({global, ?MODULE}, {unsubscribe, AppId, ChannelId, Uuid}).
+
+user_info(AppId, ChannelId, Uuid) ->
+  gen_server:call({global, ?MODULE}, {user_info, AppId, ChannelId, Uuid}).
+
+channel_info(AppId, ChannelId) ->
+  gen_server:call({global, ?MODULE}, {channel_info, AppId, ChannelId}).
 
 start_link() ->
   gen_server:start_link({global, ?MODULE}, ?MODULE, [], []).
@@ -35,13 +43,17 @@ handle_call({subscribe, AppId, ChannelId, UserInfo, Pid, Uuid}, _From, State) ->
   subscribe_user(AppId, ChannelId, UserInfo, Pid, Uuid),
   {reply, ok, State};
 
-handle_call({list, ChannelId, AppId}, _From, State) ->
-  io:format("\n~p: Received list event: ~p\n", [AppId, ChannelId]),
+handle_call({unsubscribe, AppId, ChannelId, Uuid}, _From, State) ->
+  unsubscribe_user(AppId, ChannelId, Uuid),
   {reply, ok, State};
 
-handle_call({unsubscribe, UserId, AppId}, _From, State) ->
-  io:format("\n~p: Received unsubscribe event: ~p\n", [AppId, UserId]),
-  {reply, ok, State};
+handle_call({user_info, AppId, ChannelId, Uuid}, _From, State) ->
+  {atomic, Info} = get_user_info(AppId, ChannelId, Uuid),
+  {reply, Info, State};
+
+handle_call({channel_info, AppId, ChannelId}, _From, State) ->
+  {atomic, Info} = get_channel_info(AppId, ChannelId),
+  {reply, Info, State};
 
 handle_call(stop, _From, State) ->
   mnesia:stop(),
@@ -52,7 +64,6 @@ handle_call(_Request, _From, State) ->
 
 handle_cast(_Msg, State) ->
   {noreply, State}.
-
 
 handle_info(_Info, State) ->
   {noreply, State}.
@@ -91,6 +102,14 @@ get_user_info(AppId, ChannelId, Uuid) ->
       M#presence.app_id =:= AppId,
       M#presence.channel_id =:= ChannelId,
       M#presence.uuid =:= Uuid]),
+    Results = qlc:e(Query) end,
+  mnesia:transaction(F).
+
+get_channel_info(AppId, ChannelId) ->
+  F = fun() ->
+    Query = qlc:q([M || M <- mnesia:table(presence),
+      M#presence.app_id =:= AppId,
+      M#presence.channel_id =:= ChannelId]),
     Results = qlc:e(Query) end,
   mnesia:transaction(F).
 
