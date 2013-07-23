@@ -15,7 +15,7 @@
 
 start(_StartType, _StartArgs) ->
   
-  erlypusher_presence:start(),
+  erlypusher_presence:start_link(),
 
   Port = get_port(),  
     

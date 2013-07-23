@@ -3,24 +3,26 @@
 -behaviour(gen_server).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
--export([store/0, start/0]).
+-export([subscribe/5, start_link/0]).
 -compile(export_all).
 
--record(presence, {app_id, channel_id, uuid, info, created_at, pid}).
+-include_lib("stdlib/include/qlc.hrl").
+
+-record(presence, {app_id, channel_id, uuid, info, pid, created_at}).
 
 %% Public API
 
-store() ->
-  gen_server:call(?MODULE, {msg}).
+subscribe(AppId, ChannelId, UserInfo, Pid, Uuid) ->
+  gen_server:call({global, ?MODULE}, {subscribe, AppId, ChannelId, UserInfo, Pid, Uuid}).
 
-start() ->
-  gen_server:start({global, ?MODULE}, ?MODULE, [], []).
+start_link() ->
+  gen_server:start_link({global, ?MODULE}, ?MODULE, [], []).
 
 stop() ->
-  gen_server:call(?MODULE, stop).
+  gen_server:call({global, ?MODULE}, stop).
 
 state() ->
-  gen_server:call(?MODULE, state).
+  gen_server:call({global, ?MODULE}, state).
 
 
 %% Server implementation
@@ -29,8 +31,8 @@ init([]) ->
   init_presence(),
   {ok, []}.
 
-handle_call({subscribe, UserInfo, AppId}, _From, State) ->
-  io:format("\n~p: Received subscribtion event!: ~p\n", [AppId, UserInfo]),
+handle_call({subscribe, AppId, ChannelId, UserInfo, Pid, Uuid}, _From, State) ->
+  subscribe_user(AppId, ChannelId, UserInfo, Pid, Uuid),
   {reply, ok, State};
 
 handle_call({list, ChannelId, AppId}, _From, State) ->
@@ -73,6 +75,33 @@ init_presence() ->
       mnesia:create_table(presence, [
           {attributes, record_info(fields, presence)},
           {type, bag},
-          {ram_copies, node()}
+          {ram_copies, [node()]}
       ])
+  end.
+
+unsubscribe_user(AppId, ChannelId, Uuid) ->
+  {atomic, Presences} = get_user_info(AppId, ChannelId, Uuid),
+  F = fun() ->
+    lists:foreach(fun(Presence) -> mnesia:delete_object(Presence) end, Presences) end,
+  mnesia:transaction(F).
+
+get_user_info(AppId, ChannelId, Uuid) ->
+  F = fun() ->
+    Query = qlc:q([M || M <- mnesia:table(presence),
+      M#presence.app_id =:= AppId,
+      M#presence.channel_id =:= ChannelId,
+      M#presence.uuid =:= Uuid]),
+    Results = qlc:e(Query) end,
+  mnesia:transaction(F).
+
+subscribe_user(AppId, ChannelId, UserInfo, Pid, Uuid) ->
+  case get_user_info(AppId, ChannelId, Uuid) of
+    {atomic,[]} ->
+      F = fun() ->
+        {_, CreatedAt, _} = erlang:now(),
+        mnesia:write(#presence{app_id=AppId, channel_id=ChannelId, info=UserInfo, pid=Pid, uuid=Uuid, created_at=CreatedAt})
+      end,
+      mnesia:transaction(F);
+    _ ->
+      ok
   end.
