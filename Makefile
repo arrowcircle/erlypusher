@@ -14,13 +14,13 @@ dev:
 	./rebar compile && erl -sname erlypusher@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher
 
 run:
-	./rebar compile && ERL_LIBS=apps:deps erl +K true -sname erlypusher@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error
+	./rebar compile && ERL_LIBS=apps:deps erl +K true -sname erlypusher@`hostname -s` -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error
 
 run2:
-	./rebar compile && ERL_LIBS=apps:deps erl +K true -sname erlypusher2@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error
+	./rebar compile && ERL_LIBS=apps:deps erl +K true -sname erlypusher2@`hostname -s` -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error
 
 start_daemon:
-	./rebar compile && ERL_LIBS=apps:deps run_erl -daemon  ./tmp/ ./log/ "erl +K true -sname erlypusher@localhost -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error"
+	./rebar compile && ERL_LIBS=apps:deps run_erl -daemon  ./tmp/ ./log/ "erl +K true -sname erlypusher@`hostname -s` -pa ebin deps/*/ebin -gproc gproc_dist all -boot start_sasl -s erlypusher -sasl errlog_type error"
 
 stop_daemon:
 	echo "init:stop()." | to_erl ./tmp/
