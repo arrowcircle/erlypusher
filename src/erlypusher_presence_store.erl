@@ -1,4 +1,4 @@
--module(erlypusher_presence).
+-module(erlypusher_presence_store).
 
 -behaviour(gen_server).
 
