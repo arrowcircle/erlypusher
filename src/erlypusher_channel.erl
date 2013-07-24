@@ -1,6 +1,8 @@
 -module(erlypusher_channel).
 -export([handle/1, init_connection/1]).
 
+-include_lib("erlson/include/erlson.hrl").
+
 -ifdef(TEST).
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
@@ -61,9 +63,16 @@ channel_subscription(presence, Dict) ->
 
 presence_subscription(Dict) ->
   {ok, [ChannelName]} = dict:find("channel", Dict),
-  {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
-  gproc:reg({p, g, {AppId, ChannelName}}),
-  success(ChannelName).
+  {ok, [Data]} = dict:find("data", Dict),
+  case erlson:get_value(user_id, Data, undefined) of
+    undefined ->
+      no_user_id(ChannelName);
+    UserId ->
+      {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
+      gproc:send({p, g, {AppId, ChannelName}}, member_added(UserInfo)),
+      gproc:reg({p, g, {AppId, ChannelName}}),
+      success(ChannelName)
+  end.
 
 simple_subscription(Dict) ->
   {ok, [ChannelName]} = dict:find("channel", Dict),
@@ -86,5 +95,18 @@ init({no_app, AppId}) ->
 ping() ->
   "{\"event\": \"pusher:pong\", \"data\": {}}".
 
-success(ChannelName) ->
-  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelName) ++ "\"}".
+no_user_id(ChannelId) ->
+  "{\"event\":\"pusher:error\",\"data\":{\"code\":null,\"message\":\"channel_data must include a user_id when subscribing to presence channels (" ++ binary_to_list(ChannelId) ++ ")\"}}".
+
+success_presence(ChannelId, Data) ->
+  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {" ++ Data ++ "}, \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
+
+member_added(ChannelId, UserId, UserInfo) ->
+  "".
+
+member_removed(ChannelId, UserId) ->
+  "".
+
+
+success(ChannelId) ->
+  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
