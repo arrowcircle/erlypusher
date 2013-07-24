@@ -56,8 +56,7 @@ channel_subscription(private, Dict) ->
   simple_subscription(Dict);
 
 channel_subscription(presence, Dict) ->
-  Data = dict:find("data", Dict),
-  io:format("Data is ~p\n", [Data]),
+  {ok, [Data]} = dict:find("data", Dict),
   presence_subscription(Dict).
 
 presence_subscription(Dict) ->

@@ -9,6 +9,9 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
+channel_type(undefined) ->
+  undefined;
+
 channel_type(ChannelName) ->
   String = binary_to_list(ChannelName),
   case string:str(String, "presence-") of
@@ -24,16 +27,13 @@ channel_type(ChannelName) ->
   end.
 
 auth(Json) ->
-  erlson:get_value(data.auth, Json, undefined).
+  erlson:get_value(auth, Json, undefined).
 
 channel_data(Json) ->
-  erlson:get_value(data.channel_data, Json, undefined).
+  erlson:get_value(channel_data, Json, undefined).
 
 channel(Json) ->
-  case catch Json.data.channel of
-    ChannelName -> ChannelName;
-    _ -> ""
-  end.
+  erlson:get_value(channel, Json, undefined).
 
 parse(Req, Data) ->
   FirstDict = dict:new(),
@@ -52,23 +52,22 @@ parse(Req, Data) ->
       EventDict = dict:append("event", Event, FirstDict),
       TypeDict = EventDict;
     _ ->
-      Channel = channel(Json),
+      Channel = channel(Json.data),
       ChannelType = channel_type(Channel),
       EventDict = dict:append("event", Event, FirstDict),
       ChannelDict = dict:append("channel", Channel, EventDict),
       TypeDict = dict:append("channel_type", ChannelType, ChannelDict)
   end,
-  case auth(Json) of
+  case auth(Json.data) of
     undefined -> AuthDict = TypeDict;
     Auth -> AuthDict = dict:append("auth", Auth, TypeDict)
   end,
-  case channel_data(Json) of
+  case channel_data(Json.data) of
     undefined ->
       io:format("Data is undefined \n\n"),
       DataDict = AuthDict;
-    Data -> 
-      io:format("Data is: ~p\n\n", [Data]),
-      DataDict = dict:append("data", Data, AuthDict)
+    ChannelData -> 
+      DataDict = dict:append("data", erlson:from_json(ChannelData), AuthDict)
   end,
   AppDict = dict:append("app", App, DataDict),
   PidDict = dict:append("pid", Pid, AppDict),
