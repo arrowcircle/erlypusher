@@ -15,7 +15,7 @@ websocket_init(_Any, Req, _Opt) ->
 
 websocket_handle({text, Data}, Req, State) ->
   {Dict, Req2} = erlypusher_ws_parser:parse(Req, Data),
-  Val = client_validator:check(Dict),
+  Val = erlypusher_client_validator:check(Dict),
 
   case Val of
     {error, no_app_by_key, Key} ->

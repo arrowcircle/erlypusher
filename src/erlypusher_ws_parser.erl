@@ -9,10 +9,6 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
-event(Json) ->
-  Event = Json.event,
-  Event.
-
 channel_type(ChannelName) ->
   String = binary_to_list(ChannelName),
   case string:str(String, "presence-") of
@@ -28,18 +24,10 @@ channel_type(ChannelName) ->
   end.
 
 auth(Json) ->
-  case catch Json.data.auth of
-    Auth ->
-      Auth;
-    _ ->
-      error
-  end.
+  erlson:get_value(data.auth, Json, undefined).
 
 channel_data(Json) ->
-  case catch Json.data.channel_data of
-    ChannelData -> ChannelData;
-    _ -> {}
-  end.
+  erlson:get_value(data.channel_data, Json, undefined).
 
 channel(Json) ->
   case catch Json.data.channel of
@@ -58,7 +46,7 @@ parse(Req, Data) ->
       App = {no_key, AppKey}
   end,
   Pid = element(5, Req),
-  Event = event(Json),
+  Event = Json.event,
   case Event of
     <<"pusher:ping">> ->
       EventDict = dict:append("event", Event, FirstDict),
@@ -71,12 +59,16 @@ parse(Req, Data) ->
       TypeDict = dict:append("channel_type", ChannelType, ChannelDict)
   end,
   case auth(Json) of
-    Auth -> AuthDict = dict:append("auth", Auth, TypeDict);
-    error -> AuthDict = TypeDict
+    undefined -> AuthDict = TypeDict;
+    Auth -> AuthDict = dict:append("auth", Auth, TypeDict)
   end,
-  case catch channel_data(Json) of
-    Data -> DataDict = dict:append("data", Data, AuthDict);
-    _ -> DataDict = AuthDict
+  case channel_data(Json) of
+    undefined ->
+      io:format("Data is undefined \n\n"),
+      DataDict = AuthDict;
+    Data -> 
+      io:format("Data is: ~p\n\n", [Data]),
+      DataDict = dict:append("data", Data, AuthDict)
   end,
   AppDict = dict:append("app", App, DataDict),
   PidDict = dict:append("pid", Pid, AppDict),

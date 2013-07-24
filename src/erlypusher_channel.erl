@@ -46,6 +46,27 @@ handle(<<"pusher:unsubscribe">>, Dict) ->
   unsubscribe(Dict);
 
 handle(<<"pusher:subscribe">>, Dict) ->
+  {ok, [ChannelType]} = dict:find("channel_type", Dict),
+  channel_subscription(ChannelType, Dict).
+
+channel_subscription(common, Dict) ->
+  simple_subscription(Dict);
+
+channel_subscription(private, Dict) ->
+  simple_subscription(Dict);
+
+channel_subscription(presence, Dict) ->
+  Data = dict:find("data", Dict),
+  io:format("Data is ~p\n", [Data]),
+  presence_subscription(Dict).
+
+presence_subscription(Dict) ->
+  {ok, [ChannelName]} = dict:find("channel", Dict),
+  {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
+  gproc:reg({p, g, {AppId, ChannelName}}),
+  success(ChannelName).
+
+simple_subscription(Dict) ->
   {ok, [ChannelName]} = dict:find("channel", Dict),
   {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
   gproc:reg({p, g, {AppId, ChannelName}}),
