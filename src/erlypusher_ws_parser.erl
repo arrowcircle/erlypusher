@@ -64,10 +64,9 @@ parse(Req, Data) ->
   end,
   case channel_data(Json.data) of
     undefined ->
-      io:format("Data is undefined \n\n"),
       DataDict = AuthDict;
     ChannelData -> 
-      DataDict = dict:append("data", erlson:from_json(ChannelData), AuthDict)
+      DataDict = dict:append("data", ChannelData, AuthDict)
   end,
   AppDict = dict:append("app", App, DataDict),
   PidDict = dict:append("pid", Pid, AppDict),

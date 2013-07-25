@@ -10,6 +10,7 @@
 
 start() ->
     net_adm:world(),
+    erlypusher_presence_store:start_link(),
     application:start(crypto),
     application:start(ranch),
     application:start(cowboy),

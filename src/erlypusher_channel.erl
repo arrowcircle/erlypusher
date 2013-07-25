@@ -61,30 +61,64 @@ channel_subscription(presence, Dict) ->
   {ok, [Data]} = dict:find("data", Dict),
   presence_subscription(Dict).
 
-presence_subscription(Dict) ->
-  {ok, [ChannelName]} = dict:find("channel", Dict),
-  {ok, [Data]} = dict:find("data", Dict),
-  case erlson:get_value(user_id, Data, undefined) of
-    undefined ->
-      no_user_id(ChannelName);
-    UserId ->
-      {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
-      gproc:send({p, g, {AppId, ChannelName}}, member_added(UserInfo)),
-      gproc:reg({p, g, {AppId, ChannelName}}),
-      success(ChannelName)
-  end.
-
 simple_subscription(Dict) ->
   {ok, [ChannelName]} = dict:find("channel", Dict),
   {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
   gproc:reg({p, g, {AppId, ChannelName}}),
   success(ChannelName).
 
+presence_subscription(Dict) ->
+  {ok, [ChannelName]} = dict:find("channel", Dict),
+  {ok, [Data]} = dict:find("data", Dict),
+  ErlsonData = erlson:from_json(Data),
+  case erlson:get_value(user_id, ErlsonData, undefined) of
+    undefined ->
+      no_user_id(ChannelName);
+    UserId ->
+      {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
+      % UserInfo = extract_user_info(Data),
+      % io:format("presence_succeed: ~p\n\n", [success_presence(ChannelName, UserInfo)]),
+      erlypusher_presence_store:subscribe(AppId, ChannelName, Data, self(), UserId),
+      PresenceData = prepare_channel_info(erlypusher_presence_store:channel_info(AppId, ChannelName)),
+      gproc:send({p, g, {AppId, ChannelName}}, member_added(ChannelName, Data)),
+      gproc:reg({p, g, {AppId, ChannelName}}),
+      success(ChannelName)
+  end.
+
 unsubscribe(Dict) ->
   {ok, [ChannelName]} = dict:find("channel", Dict),
   {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
   gproc:unreg({p, g, {AppId, ChannelName}}),
   success(ChannelName).
+
+extract_user_info(Data) ->
+  {List} = jiffy:decode(Data),
+  jiffy:encode({remove_user_id(List)}).
+
+remove_user_id(List) ->
+  remove_user_id(List, []).
+
+remove_user_id([], Result) ->
+  Result;
+
+remove_user_id(List, Result) ->
+  [{Key, Value}|T] = List,
+  case Key of
+    <<"user_id">> ->
+      remove_user_id(T, Result);
+    _ ->
+      remove_user_id(T, [{Key, Value}|Result])
+  end.
+
+prepare_channel_info(List) ->
+  jiffy:encode(prepare_channel_info(List, dict:new())).
+
+prepare_channel_info([], Results) ->
+  Results;
+
+prepare_channel_info(List, Results) ->
+  [H|T] = List,
+  io:format("Head: ~p\n", [H]).
 
 init({ok, SocketId}) ->
   "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ SocketId ++ "\"}}";
@@ -99,14 +133,13 @@ no_user_id(ChannelId) ->
   "{\"event\":\"pusher:error\",\"data\":{\"code\":null,\"message\":\"channel_data must include a user_id when subscribing to presence channels (" ++ binary_to_list(ChannelId) ++ ")\"}}".
 
 success_presence(ChannelId, Data) ->
-  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {" ++ Data ++ "}, \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
+  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": " ++ binary_to_list(Data) ++ ", \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
 
-member_added(ChannelId, UserId, UserInfo) ->
-  "".
+member_added(ChannelId, UserInfo) ->
+  "{\"event\":\"pusher_internal:member_added\",\"data\":" ++ binary_to_list(UserInfo) ++ ", \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
 
 member_removed(ChannelId, UserId) ->
   "".
-
 
 success(ChannelId) ->
   "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".

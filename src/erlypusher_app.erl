@@ -14,8 +14,6 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-  
-  erlypusher_presence_store:start_link(),
 
   Port = get_port(),  
     
