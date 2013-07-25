@@ -76,13 +76,13 @@ presence_subscription(Dict) ->
       no_user_id(ChannelName);
     UserId ->
       {ok, [{AppId, _Key, _Secret, _Name}]} = dict:find("app", Dict),
-      % UserInfo = extract_user_info(Data),
-      % io:format("presence_succeed: ~p\n\n", [success_presence(ChannelName, UserInfo)]),
-      erlypusher_presence_store:subscribe(AppId, ChannelName, Data, self(), UserId),
-      PresenceData = prepare_channel_info(erlypusher_presence_store:channel_info(AppId, ChannelName)),
+      erlypusher_presence_store:subscribe(AppId, ChannelName, ErlsonData.user_info, self(), UserId),
+      {Ids, Hash} = prepare_channel_info(erlypusher_presence_store:channel_info(AppId, ChannelName)),
+      InfoHash = {[{count, lists:flatlength(Ids)}, {ids, Ids}, {hash, Hash}]},
+      PresenceHash = {[{presence, InfoHash}]},
       gproc:send({p, g, {AppId, ChannelName}}, member_added(ChannelName, Data)),
       gproc:reg({p, g, {AppId, ChannelName}}),
-      success(ChannelName)
+      success_presence(ChannelName, jiffy:encode(PresenceHash))
   end.
 
 unsubscribe(Dict) ->
@@ -96,7 +96,8 @@ extract_user_info(Data) ->
   jiffy:encode({remove_user_id(List)}).
 
 remove_user_id(List) ->
-  remove_user_id(List, []).
+  {Data} = jiffy:decode(List),
+  remove_user_id(Data, []).
 
 remove_user_id([], Result) ->
   Result;
@@ -110,15 +111,20 @@ remove_user_id(List, Result) ->
       remove_user_id(T, [{Key, Value}|Result])
   end.
 
-prepare_channel_info(List) ->
-  jiffy:encode(prepare_channel_info(List, dict:new())).
+prepare_channel_info(Presence) ->
+  prepare_channel_info(Presence, [], []).
 
-prepare_channel_info([], Results) ->
-  Results;
+prepare_channel_info([], Ids, Results) ->
+  {Ids, {Results}};
 
-prepare_channel_info(List, Results) ->
-  [H|T] = List,
-  io:format("Head: ~p\n", [H]).
+prepare_channel_info(Presence, Ids, Results) ->
+  [{presence, AppId, ChannelId, Uuid, Info, Pid, CreatedAt}|T] = Presence,
+  case lists:any(fun(X) -> Uuid == X end, Ids) of
+    true ->
+      prepare_channel_info(T, Ids, Results);
+    _ ->    
+      prepare_channel_info(T, [list_to_binary(integer_to_list(Uuid))|Ids], [{list_to_binary(integer_to_list(Uuid)), {Info}}|Results])
+  end.
 
 init({ok, SocketId}) ->
   "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ SocketId ++ "\"}}";
