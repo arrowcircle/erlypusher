@@ -2,9 +2,9 @@
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("erlson/include/erlson.hrl").
--define(COMMON_CHANNEL_JSON, erlson:from_json(<<"{\"event\":\"pusher:subscribe\",\"data\":{\"channel\":\"MY_CHANNEL\"}}">>)).
--define(AUTH_JSON, erlson:from_json(<<"{\"event\":\"pusher:subscribe\",\"data\":{\"channel\":\"MY_CHANNEL\", \"auth\": \"AUTHKEY\"}}">>)).
--define(DATA_JSON, erlson:from_json(<<"{\"event\":\"pusher:subscribe\",\"data\":{\"channel\":\"presence-example-channel\", \"auth\": \"AUTHKEY\", \"channel_data\": \"CHANNELOBJECT\"}}">>)).
+-define(COMMON_CHANNEL_JSON, erlson:from_json(<<"{\"channel\":\"MY_CHANNEL\"}">>)).
+-define(AUTH_JSON, erlson:from_json(<<"{\"channel\":\"MY_CHANNEL\", \"auth\": \"AUTHKEY\"}">>)).
+-define(DATA_JSON, erlson:from_json(<<"{\"channel\":\"presence-example-channel\", \"auth\": \"AUTHKEY\", \"channel_data\": \"CHANNELOBJECT\"}">>)).
 
 -define(COMMON_CHANNEL, <<"MY_CHANNEL">>).
 -define(PRIVATE_CHANNEL, <<"private-MY_CHANNEL">>).
@@ -44,8 +44,7 @@ auth({Dict, Req}) ->
   Auth.
 
 erlypusher_ws_parser_tests(_I) ->
-  [?_assertEqual(<<"pusher:subscribe">>, erlypusher_ws_parser:event(?COMMON_CHANNEL_JSON)),
-   ?_assertEqual(<<"MY_CHANNEL">>, erlypusher_ws_parser:channel(?COMMON_CHANNEL_JSON)),
+  [?_assertEqual(<<"MY_CHANNEL">>, erlypusher_ws_parser:channel(?COMMON_CHANNEL_JSON)),
    ?_assertEqual(common, erlypusher_ws_parser:channel_type(?COMMON_CHANNEL)),
    ?_assertEqual(private, erlypusher_ws_parser:channel_type(?PRIVATE_CHANNEL)),
    ?_assertEqual(presence, erlypusher_ws_parser:channel_type(?PRESENCE_CHANNEL)),
