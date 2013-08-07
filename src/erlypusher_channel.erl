@@ -82,6 +82,8 @@ presence_subscription(Dict) ->
       PresenceHash = {[{presence, InfoHash}]},
       gproc:send({p, g, {AppId, ChannelName}}, member_added(ChannelName, Data)),
       gproc:reg({p, g, {AppId, ChannelName}}),
+      % success_presence(ChannelName, erlson:to_json(ErlsonHash))
+      % io:format("H: ~p\n", [gsub(jiffy:encode(PresenceHash), "\"", "\\\"")]),
       success_presence(ChannelName, jiffy:encode(PresenceHash))
   end.
 
@@ -126,6 +128,10 @@ prepare_channel_info(Presence, Ids, Results) ->
       prepare_channel_info(T, [list_to_binary(integer_to_list(Uuid))|Ids], [{list_to_binary(integer_to_list(Uuid)), {Info}}|Results])
   end.
 
+gsub(Str,Old,New) ->
+  RegExp = "\\Q"++Old++"\\E",
+  re:replace(Str,RegExp,New,[global, multiline, {return, list}]).
+
 init({ok, SocketId}) ->
   "{\"event\": \"pusher:connection_established\", \"data\": {\"socket_id\": \"" ++ SocketId ++ "\"}}";
 
@@ -139,7 +145,9 @@ no_user_id(ChannelId) ->
   "{\"event\":\"pusher:error\",\"data\":{\"code\":null,\"message\":\"channel_data must include a user_id when subscribing to presence channels (" ++ binary_to_list(ChannelId) ++ ")\"}}".
 
 success_presence(ChannelId, Data) ->
-  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": " ++ binary_to_list(Data) ++ ", \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
+  jiffy:encode({[{event, <<"pusher_internal:subscription_succeeded">>}, {channel, ChannelId}, {data, Data}]}).
+  % "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\":" ++ binary_to_list(Data) ++ ", \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
+  % }
 
 member_added(ChannelId, UserInfo) ->
   "{\"event\":\"pusher_internal:member_added\",\"data\":" ++ binary_to_list(UserInfo) ++ ", \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
@@ -148,4 +156,4 @@ member_removed(ChannelId, UserId) ->
   "".
 
 success(ChannelId) ->
-  "{\"event\": \"pusher_internal:connection_succeedeed\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
+  "{\"event\": \"pusher_internal:subscription_succeeded\", \"data\": {}, \"channel\": \"" ++ binary_to_list(ChannelId) ++ "\"}".
