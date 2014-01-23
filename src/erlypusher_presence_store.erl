@@ -11,15 +11,19 @@
 
 %% Public API
 
+% Subscribe user to the channel
 subscribe(AppId, ChannelId, UserInfo, Pid, Uuid) ->
   gen_server:call({global, ?MODULE}, {subscribe, AppId, ChannelId, UserInfo, Pid, Uuid}).
 
+% Unsubscribe all user connections from the channel
 unsubscribe(AppId, ChannelId, Uuid) ->
   gen_server:call({global, ?MODULE}, {unsubscribe, AppId, ChannelId, Uuid}).
 
+% Get user info for the channel
 user_info(AppId, ChannelId, Uuid) ->
   gen_server:call({global, ?MODULE}, {user_info, AppId, ChannelId, Uuid}).
 
+% Get channel info
 channel_info(AppId, ChannelId) ->
   gen_server:call({global, ?MODULE}, {channel_info, AppId, ChannelId}).
 
@@ -72,6 +76,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Internal functions
 
+% init mnesia store
 init_presence() ->
   mnesia:create_schema(node()),
   mnesia:start(),
@@ -86,12 +91,21 @@ init_presence() ->
       ])
   end.
 
+% Delete all user presences for this channel
 unsubscribe_user(AppId, ChannelId, Uuid) ->
   {atomic, Presences} = get_user_info(AppId, ChannelId, Uuid),
   F = fun() ->
     lists:foreach(fun(Presence) -> mnesia:delete_object(Presence) end, Presences) end,
   mnesia:transaction(F).
 
+% Here we should have method for disconnect
+disconnect_user(AppId, ChannelId, Uuid, Pid) ->
+  {atomic, Presences} = get_user_info(AppId, ChannelId, Uuid),
+  F = fun() ->
+    lists:foreach(fun(Presence) -> mnesia:delete_object(Presence) end, Presences) end,
+  mnesia:transaction(F).
+
+% Returns info about user for the channel
 get_user_info(AppId, ChannelId, Uuid) ->
   F = fun() ->
     Query = qlc:q([M || M <- mnesia:table(presence),
@@ -101,6 +115,7 @@ get_user_info(AppId, ChannelId, Uuid) ->
     Results = qlc:e(Query) end,
   mnesia:transaction(F).
 
+% Returns info about channel
 get_channel_info(AppId, ChannelId) ->
   F = fun() ->
     Query = qlc:q([M || M <- mnesia:table(presence),
@@ -109,14 +124,15 @@ get_channel_info(AppId, ChannelId) ->
     Results = qlc:e(Query) end,
   mnesia:transaction(F).
 
+% Writes user info to presence store
 subscribe_user(AppId, ChannelId, UserInfo, Pid, Uuid) ->
-  case get_user_info(AppId, ChannelId, Uuid) of
-    {atomic,[]} ->
+  % case get_user_info(AppId, ChannelId, Uuid) of
+    % {atomic,[]} ->
       F = fun() ->
         {_, CreatedAt, _} = erlang:now(),
         mnesia:write(#presence{app_id=AppId, channel_id=ChannelId, info=UserInfo, pid=Pid, uuid=Uuid, created_at=CreatedAt})
       end,
-      mnesia:transaction(F);
-    _ ->
-      ok
-  end.
+      mnesia:transaction(F).
+    % _ ->
+      % ok
+  % end.

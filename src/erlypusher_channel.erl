@@ -82,8 +82,6 @@ presence_subscription(Dict) ->
       PresenceHash = {[{presence, InfoHash}]},
       gproc:send({p, g, {AppId, ChannelName}}, member_added(ChannelName, Data)),
       gproc:reg({p, g, {AppId, ChannelName}}),
-      % success_presence(ChannelName, erlson:to_json(ErlsonHash))
-      % io:format("H: ~p\n", [gsub(jiffy:encode(PresenceHash), "\"", "\\\"")]),
       success_presence(ChannelName, jiffy:encode(PresenceHash))
   end.
 
