@@ -1,14 +1,14 @@
 erlypusher (NO DEVELOPMENT)
 ==========
-asdfasf
 [![Build Status](https://travis-ci.org/arrowcircle/erlypusher.png?branch=master)](https://travis-ci.org/arrowcircle/erlypusher)
 
 # This project is abandoded
 
 Please use [@edgurgel/poxa](https://github.com/edgurgel/poxa) instead. Its the same alternative Pusher backend writen in Elixir language.
+
 There is another great project [@centrifugal/centrifugo](https://github.com/centrifugal/centrifugo) by Mail.Ru.
 
-
+==========
 Erlang server for pusher app
 
 # Installation
